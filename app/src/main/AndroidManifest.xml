@@ -21,10 +21,6 @@
         </activity>
 
         <receiver android:name=".alarm_receiver"/>
-        <service android:name=".RingtoneService"
-            android:enabled="true">
-
-        </service>
     </application>
 
 </manifest>

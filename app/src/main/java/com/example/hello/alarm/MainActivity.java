@@ -24,6 +24,7 @@ import android.widget.TimePicker;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -57,11 +58,15 @@ public class MainActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
+                Date current_date = new Date();
+                calendar.set(Calendar.DATE, current_date.getDate());
                 calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
                 calendar.set(Calendar.MINUTE, timePicker.getMinute());
-
-                int hour = timePicker.getHour();
-                int minute = timePicker.getMinute();
+                Log.e("Time", "onClick: "+ calendar.getTime() );
+                if(calendar.before(Calendar.getInstance())) {
+                    calendar.add(Calendar.DATE, 1);
+                    Log.e("Time", "onClick: "+ calendar.getTime() );
+                };
 
 
                 Intent intent_main_activity = new Intent(context, MainActivity.class);
@@ -91,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             String hour_string, minute_string;
             hour_string = String.valueOf(hour);
             minute_string = minute < 10 ? "0" + String.valueOf(minute) : String.valueOf(minute);
-            this.time_string = hour_string + " :" + minute_string;
+            this.time_string = hour_string + " : " + minute_string;
             Log.e("alarm", "alarm: "+this.time_string);
         }
 
