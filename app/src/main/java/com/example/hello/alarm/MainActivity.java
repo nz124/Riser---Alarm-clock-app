@@ -1,21 +1,19 @@
 package com.example.hello.alarm;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.AlarmClock;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.Snackbar;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,6 +25,7 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+
 public class MainActivity extends AppCompatActivity {
 
     AlarmManager alarmManager;
@@ -34,24 +33,27 @@ public class MainActivity extends AppCompatActivity {
     TextView updateText;
     Context context;
     Button setOnButton;
-    ArrayList<alarm> alarm_data;
+    PendingIntent pending_intent;
+    ArrayList alarm_data;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         this.context = this;
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         timePicker = findViewById(R.id.timePicker);
-
+        //Create array of all alarm to show on the list view
+        alarm_data = new ArrayList<>();
+        final alarm_adapter adapter = new alarm_adapter(this, R.layout.listitem, alarm_data);
+        final ListView alarm_list = findViewById(R.id.listView);
+        alarm_list.setAdapter(adapter);
         final Calendar calendar = Calendar.getInstance();
+        final Intent alarm_intent = new Intent(this.context, alarm_receiver.class);
 
 
-
-        setOnButton = (Button) findViewById(R.id.setOn);
+        setOnButton = findViewById(R.id.setOn);
         setOnButton.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SetTextI18n")
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
@@ -62,50 +64,73 @@ public class MainActivity extends AppCompatActivity {
                 int minute = timePicker.getMinute();
 
 
+                Intent intent_main_activity = new Intent(context, MainActivity.class);
+                PendingIntent pending_main_activity = PendingIntent.getActivity(context, 0, intent_main_activity, 0);
+                alarm_intent.putExtra("extra", "yes");
+                pending_intent = PendingIntent.getBroadcast(MainActivity.this, 0, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_main_activity);
+                alarmManager.setAlarmClock(alarm_info, pending_intent);
 
-                Intent i = new Intent(AlarmClock.ACTION_SET_ALARM);
-                i.putExtra(AlarmClock.EXTRA_MESSAGE, "New Alarm");
-                i.putExtra(AlarmClock.EXTRA_HOUR, hour);
-                i.putExtra(AlarmClock.EXTRA_MINUTES, minute);
-                i.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-
-
-                startActivity(i);
-
+                //Add alarm to list view
                 alarm newAlarm = new alarm(hour, minute);
                 adapter.add(newAlarm);
 
+
+
             }
         });
+    };
 
-        };
+    public class alarm{
+        String time_string;
+        public alarm(){
+            super();
+        }
+        public alarm(int hour, int minute){
+            super();
+            String hour_string, minute_string;
+            hour_string = String.valueOf(hour);
+            minute_string = String.valueOf(minute);
 
-
-
-
-
-
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+            this.time_string = hour_string + " :" + minute_string;
+            Log.e("alarm", "alarm: "+this.time_string);
         }
 
-        return super.onOptionsItemSelected(item);
     }
+
+    public class alarm_adapter extends ArrayAdapter<alarm> {
+        alarm_adapter(Context context, int listViewResource, ArrayList<alarm> alarms) {
+            super(context, R.layout.listitem, alarms);
+        }
+
+
+        @NonNull
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent){
+            final alarm alarm = getItem(position);
+            if (convertView == null){
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem, parent, false);
+            }
+            TextView tvTime = convertView.findViewById(R.id.tvTime);
+            Switch switchButton = convertView.findViewById(R.id.switchButton);
+            Button removeButton = convertView.findViewById(R.id.remove_button);
+            switchButton.setChecked(true);
+            removeButton.setOnClickListener(new View.OnClickListener(){
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    alarm_data.remove(position);
+                    notifyDataSetChanged();
+                }
+
+
+            });
+            assert alarm != null;
+            tvTime.setText(alarm.time_string);
+            return convertView;
+        }
+
+    }
+
+
 }
