@@ -90,8 +90,7 @@ public class MainActivity extends AppCompatActivity {
             super();
             String hour_string, minute_string;
             hour_string = String.valueOf(hour);
-            minute_string = String.valueOf(minute);
-
+            minute_string = minute < 10 ? "0" + String.valueOf(minute) : String.valueOf(minute);
             this.time_string = hour_string + " :" + minute_string;
             Log.e("alarm", "alarm: "+this.time_string);
         }

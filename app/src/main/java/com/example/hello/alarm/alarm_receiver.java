@@ -43,6 +43,9 @@ public class alarm_receiver extends BroadcastReceiver {
             NotificationChannel channel = new NotificationChannel(channelId, name, importance);
             channel.setDescription(description);
             channel.enableVibration(true);
+
+
+
             channel.setSound(Uri.parse("android.resource://"+ context.getPackageName()+"/"+R.raw.apple_ring), aSound_attribute);
             // Register the channel with the system
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(MainActivity.NOTIFICATION_SERVICE);
