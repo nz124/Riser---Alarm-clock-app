@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         final Intent alarm_intent = new Intent(this.context, alarm_receiver.class);
 
 
+
         setOnButton = findViewById(R.id.setOn);
         setOnButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
@@ -67,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
                     calendar.add(Calendar.DATE, 1);
                     Log.e("Time", "onClick: "+ calendar.getTime() );
                 };
+
+                int hour = timePicker.getHour();
+                int minute = timePicker.getMinute();
 
 
                 Intent intent_main_activity = new Intent(context, MainActivity.class);

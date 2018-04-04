@@ -1,5 +1,6 @@
 package com.example.hello.alarm;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -43,29 +44,29 @@ public class alarm_receiver extends BroadcastReceiver {
             NotificationChannel channel = new NotificationChannel(channelId, name, importance);
             channel.setDescription(description);
             channel.enableVibration(true);
-
-
-
             channel.setSound(Uri.parse("android.resource://"+ context.getPackageName()+"/"+R.raw.apple_ring), aSound_attribute);
             // Register the channel with the system
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(MainActivity.NOTIFICATION_SERVICE);
-            assert notificationManager!= null;
+            assert notificationManager != null;
             notificationManager.createNotificationChannel(channel);
         }
+
         Intent intent_main_activity = new Intent(context, MainActivity.class);
-        PendingIntent pending_intent_main_activity = PendingIntent.getActivity(context, 0, intent_main_activity, 0);
-        PendingIntent turn_off_intent = PendingIntent.getActivity(context, 1, intent_main_activity, 0);
-        PendingIntent snooze_intent = PendingIntent.getActivity(context, 2, intent_main_activity, 0);
+        PendingIntent turn_off_intent = PendingIntent.getActivity(context, 1, intent_main_activity, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent snooze_intent = PendingIntent.getActivity(context, 2, intent_main_activity, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.alarmclock)
                 .setContentTitle("The alarm is going off")
                 .setContentText("Turn off")
-                .setContentIntent(pending_intent_main_activity)
+                .setFullScreenIntent(turn_off_intent, true)
                 .addAction(R.drawable.alarmclock, "Turn Off", turn_off_intent)
                 .addAction(R.drawable.alarmclock, "Snooze", snooze_intent);
         builder.setSound(Uri.parse("android.resource://"+ context.getPackageName()+"/"+R.raw.apple_ring));
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        notificationManager.notify(0, builder.build());
+        Notification mNotification = builder.build();
+        mNotification.flags = Notification.FLAG_INSISTENT;
+        NotificationManagerCompat notification= NotificationManagerCompat.from(context);
+
+        notification.notify(0, mNotification);
     }
 }
