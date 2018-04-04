@@ -8,13 +8,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioAttributes;
-import android.media.AudioTrack;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
+import java.util.Random;
 
 /**
  * Created by hello on 3/11/18.
@@ -30,6 +29,7 @@ public class alarm_receiver extends BroadcastReceiver {
 
     private void showNotification(Context context){
         String channelId = "alarm_channel";
+        int notificationId = new Random().nextInt();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             //Create audio attribute instance to set notification's sound
             AudioAttributes aSound_attribute = new AudioAttributes.Builder()
@@ -50,9 +50,12 @@ public class alarm_receiver extends BroadcastReceiver {
             assert notificationManager != null;
             notificationManager.createNotificationChannel(channel);
         }
-
+        Intent cancelIntent = new Intent(context, CancelNotification.class);
+        Bundle extras = new Bundle();
+        extras.putInt("notification_id", notificationId);
+        cancelIntent.putExtras(extras);
         Intent intent_main_activity = new Intent(context, MainActivity.class);
-        PendingIntent turn_off_intent = PendingIntent.getActivity(context, 1, intent_main_activity, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent turn_off_intent = PendingIntent.getActivity(context, 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent snooze_intent = PendingIntent.getActivity(context, 2, intent_main_activity, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
@@ -67,6 +70,9 @@ public class alarm_receiver extends BroadcastReceiver {
         mNotification.flags = Notification.FLAG_INSISTENT;
         NotificationManagerCompat notification= NotificationManagerCompat.from(context);
 
-        notification.notify(0, mNotification);
+        notification.notify(notificationId, mNotification);
     }
 }
+
+
+

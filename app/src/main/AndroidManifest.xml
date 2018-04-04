@@ -19,6 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".CancelNotification"/>
 
         <receiver android:name=".alarm_receiver"/>
     </application>
