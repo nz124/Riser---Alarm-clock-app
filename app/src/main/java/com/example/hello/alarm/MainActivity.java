@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
         final ListView alarm_list = findViewById(R.id.listView);
         alarm_list.setAdapter(adapter);
         final Calendar calendar = Calendar.getInstance();
-        final Intent alarm_intent = new Intent(this.context, alarm_receiver.class);
-
 
 
         setOnButton = findViewById(R.id.setOn);
@@ -65,15 +63,13 @@ public class MainActivity extends AppCompatActivity {
                 if(calendar.before(Calendar.getInstance())) {
                     calendar.add(Calendar.DATE, 1);
                     Log.e("Time", "onClick: "+ calendar.getTime() );
-                };
+                }
 
                 int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
 
-
-                Intent intent_main_activity = new Intent(context, MainActivity.class);
-                PendingIntent pending_main_activity = PendingIntent.getActivity(context, 0, intent_main_activity, 0);
-                alarm_intent.putExtra("extra", "yes");
+                final Intent alarm_intent = new Intent(context, alarm_receiver.class);
+                PendingIntent pending_main_activity = PendingIntent.getActivity(context, 0, alarm_intent, 0);
                 pending_intent = PendingIntent.getBroadcast(MainActivity.this, 0, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_main_activity);
                 alarmManager.setAlarmClock(alarm_info, pending_intent);
@@ -98,8 +94,8 @@ public class MainActivity extends AppCompatActivity {
             String hour_string, minute_string;
             hour_string = String.valueOf(hour);
             minute_string = minute < 10 ? "0" + String.valueOf(minute) : String.valueOf(minute);
+
             this.time_string = hour_string + " : " + minute_string;
-            Log.e("alarm", "alarm: "+this.time_string);
         }
 
     }

@@ -69,7 +69,6 @@ public class alarm_receiver extends BroadcastReceiver {
         Notification mNotification = builder.build();
         mNotification.flags = Notification.FLAG_INSISTENT;
         NotificationManagerCompat notification= NotificationManagerCompat.from(context);
-
         notification.notify(notificationId, mNotification);
     }
 }
