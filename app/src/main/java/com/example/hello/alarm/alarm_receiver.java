@@ -59,7 +59,6 @@ public class alarm_receiver extends BroadcastReceiver {
         PendingIntent snooze_intent = PendingIntent.getActivity(context, 2, intent_main_activity, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.alarmclock)
                 .setContentTitle("The alarm is going off")
                 .setContentText("Turn off")
                 .setFullScreenIntent(turn_off_intent, true)
@@ -69,6 +68,7 @@ public class alarm_receiver extends BroadcastReceiver {
         Notification mNotification = builder.build();
         mNotification.flags = Notification.FLAG_INSISTENT;
         NotificationManagerCompat notification= NotificationManagerCompat.from(context);
+
         notification.notify(notificationId, mNotification);
     }
 }
