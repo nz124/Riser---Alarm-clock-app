@@ -20,10 +20,11 @@ import java.util.Random;
  */
 
 public class alarm_receiver extends BroadcastReceiver {
-
+    Intent cancelIntent;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        cancelIntent = new Intent(context, CancelNotification.class);
         showNotification(context);
     }
 
@@ -50,7 +51,6 @@ public class alarm_receiver extends BroadcastReceiver {
             assert notificationManager != null;
             notificationManager.createNotificationChannel(channel);
         }
-        Intent cancelIntent = new Intent(context, CancelNotification.class);
         Bundle extras = new Bundle();
         extras.putInt("notification_id", notificationId);
         cancelIntent.putExtras(extras);
@@ -59,6 +59,7 @@ public class alarm_receiver extends BroadcastReceiver {
         PendingIntent snooze_intent = PendingIntent.getActivity(context, 2, intent_main_activity, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.alarmclock)
                 .setContentTitle("The alarm is going off")
                 .setContentText("Turn off")
                 .setFullScreenIntent(turn_off_intent, true)

@@ -24,6 +24,7 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -71,12 +72,13 @@ public class MainActivity extends AppCompatActivity {
                 int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
 
+                int alarm_id = new Random().nextInt();
 
 
                 Intent intent_main_activity = new Intent(context, MainActivity.class);
-                PendingIntent pending_main_activity = PendingIntent.getActivity(context, 0, intent_main_activity, 0);
+                PendingIntent pending_main_activity = PendingIntent.getActivity(context, alarm_id, intent_main_activity, 0);
                 alarm_intent.putExtra("extra", "yes");
-                pending_intent = PendingIntent.getBroadcast(MainActivity.this, 0, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                pending_intent = PendingIntent.getBroadcast(MainActivity.this, alarm_id, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_main_activity);
                 alarmManager.setAlarmClock(alarm_info, pending_intent);
 
