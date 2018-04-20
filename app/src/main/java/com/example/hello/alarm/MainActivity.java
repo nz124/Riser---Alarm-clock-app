@@ -76,14 +76,14 @@ public class MainActivity extends AppCompatActivity {
 
 
                 Intent intent_main_activity = new Intent(context, MainActivity.class);
-                PendingIntent pending_main_activity = PendingIntent.getActivity(context, alarm_id, intent_main_activity, 0);
-                alarm_intent.putExtra("extra", "yes");
+                alarm_intent.putExtra("alarm_id", alarm_id);
                 pending_intent = PendingIntent.getBroadcast(MainActivity.this, alarm_id, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_main_activity);
+                AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_intent);
                 alarmManager.setAlarmClock(alarm_info, pending_intent);
 
+
                 //Add alarm to list view
-                alarm newAlarm = new alarm(hour, minute);
+                alarm newAlarm = new alarm(pending_intent, hour, minute);
                 adapter.add(newAlarm);
 
 //Subtract the current second
@@ -96,11 +96,13 @@ public class MainActivity extends AppCompatActivity {
 
     public class alarm{
         String time_string;
+        PendingIntent alarm_pending_intent;
         public alarm(){
             super();
         }
-        public alarm(int hour, int minute){
+        public alarm(PendingIntent alarm_pending_intent, int hour, int minute){
             super();
+            this.alarm_pending_intent= alarm_pending_intent;
             String hour_string, minute_string;
             hour_string = String.valueOf(hour);
             minute_string = minute < 10 ? "0" + String.valueOf(minute) : String.valueOf(minute);
@@ -128,9 +130,11 @@ public class MainActivity extends AppCompatActivity {
             Button removeButton = convertView.findViewById(R.id.remove_button);
             switchButton.setChecked(true);
             removeButton.setOnClickListener(new View.OnClickListener(){
-                @RequiresApi(api = Build.VERSION_CODES.M)
                 @Override
                 public void onClick(View v) {
+                    //Remove the alarm from AlarmManager and from ListView]
+                    Log.e("hey", "onClick: "+alarm.alarm_pending_intent );
+                    alarmManager.cancel(alarm.alarm_pending_intent);
                     alarm_data.remove(position);
                     notifyDataSetChanged();
                 }

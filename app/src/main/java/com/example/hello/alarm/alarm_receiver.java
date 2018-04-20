@@ -21,6 +21,7 @@ import java.util.Random;
 
 public class alarm_receiver extends BroadcastReceiver {
     Intent cancelIntent;
+    int alarm_id;
 
     @Override
     public void onReceive(Context context, Intent intent) {
