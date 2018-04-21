@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".CancelNotification"/>
-
+        <service android:name=".SnoozeAlarm"/>
         <receiver android:name=".alarm_receiver"/>
     </application>
 

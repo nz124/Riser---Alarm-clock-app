@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 int alarm_id = new Random().nextInt();
 
 
-                Intent intent_main_activity = new Intent(context, MainActivity.class);
+
                 alarm_intent.putExtra("alarm_id", alarm_id);
                 pending_intent = PendingIntent.getBroadcast(MainActivity.this, alarm_id, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_intent);
@@ -85,9 +85,6 @@ public class MainActivity extends AppCompatActivity {
                 //Add alarm to list view
                 alarm newAlarm = new alarm(pending_intent, hour, minute);
                 adapter.add(newAlarm);
-
-//Subtract the current second
-                //Job scheduler
 
 
             }

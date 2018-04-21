@@ -21,11 +21,13 @@ import java.util.Random;
 
 public class alarm_receiver extends BroadcastReceiver {
     Intent cancelIntent;
+    Intent snoozeIntent;
     int alarm_id;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         cancelIntent = new Intent(context, CancelNotification.class);
+        snoozeIntent = new Intent(context, SnoozeAlarm.class);
         showNotification(context);
     }
 
@@ -55,9 +57,10 @@ public class alarm_receiver extends BroadcastReceiver {
         Bundle extras = new Bundle();
         extras.putInt("notification_id", notificationId);
         cancelIntent.putExtras(extras);
-        Intent intent_main_activity = new Intent(context, MainActivity.class);
+        snoozeIntent.putExtras(extras);
+
         PendingIntent turn_off_intent = PendingIntent.getActivity(context, 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent snooze_intent = PendingIntent.getActivity(context, 2, intent_main_activity, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent snooze_intent = PendingIntent.getService(context, 2, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.alarmclock)
