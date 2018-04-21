@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.hello.alarm">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/alarmclock"
@@ -8,19 +9,25 @@
         android:roundIcon="@drawable/alarmclock"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".SignInActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat">
+            <intent-filter>
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/Theme.AppCompat">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
         </activity>
         <activity android:name=".CancelNotification"/>
         <service android:name=".SnoozeAlarm"/>
         <receiver android:name=".alarm_receiver"/>
     </application>
-
 </manifest>
