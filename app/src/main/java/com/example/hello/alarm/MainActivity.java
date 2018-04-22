@@ -31,6 +31,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -47,8 +49,9 @@ public class MainActivity extends AppCompatActivity {
     Button setOnButton;
     PendingIntent pending_intent;
     ArrayList alarm_data;
-    FirebaseDatabase database;
-    DatabaseReference myRef;
+    static FirebaseDatabase database;
+    static DatabaseReference myRef;
+    Integer current_point;
 
 
     @Override
@@ -56,10 +59,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.context = this;
-        //Access database
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("message");
-        myRef.setValue("Hello, World!");
+
 
 
         //Side nav drawer
@@ -79,20 +79,29 @@ public class MainActivity extends AppCompatActivity {
             photoUrl = currentUser.getPhotoUrl();
             uID = currentUser.getUid();
         };
+
+        //Access database
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference(uID).child("Point");
+
+
+
+
         //Set information in the nav's header
         View header_view = navigationView.getHeaderView(0);
-        TextView nav_user = header_view.findViewById(R.id.user_name);
-        nav_user.setText(email);
+        final TextView nav_user = header_view.findViewById(R.id.user_name);
 
-        incrementPointAndSaveToDb(true, uID);
         // Read from the database
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                Log.d("", "Value is: " + value);
+                current_point = dataSnapshot.getValue(Integer.class);
+                if (current_point != null) {
+                    String point_display = String.valueOf(current_point);
+                    nav_user.setText(point_display);
+                }
             }
 
             @Override
@@ -101,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.w("", "Failed to read value.", error.toException());
             }
         });
+
 
 
 
@@ -165,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 adapter.add(newAlarm);
 
 
+
             }
         });
     };
@@ -223,11 +234,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void incrementPointAndSaveToDb(Boolean state, String userID){
-        if (state && userID!= null){
-            myRef.setValue("Hello, World!");
-            Log.e("UID", "onCreate: "+ myRef.child("message"));
-        }
+    public static void incrementPointAndSaveToDb(final boolean increment, final int point){
+        myRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(final MutableData currentData) {
+                if (currentData.getValue(Integer.class) == null) {
+                    currentData.setValue(0);
+                } else {
+                    if (increment){
+                         currentData.setValue(currentData.getValue(Integer.class) + point);
+                    }
+                    else{
+                         currentData.setValue(currentData.getValue(Integer.class) - point);
+                    }
+                }
+
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    Log.d("Fail:","Firebase counter increment failed." + databaseError);
+                } else {
+                    Log.d("Success", "Increment successfully");
+                }
+            }
+
+
+        });
     }
 
 

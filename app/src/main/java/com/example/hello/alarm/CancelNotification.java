@@ -19,6 +19,8 @@ public class CancelNotification extends Activity {
         Log.e("duy", "onCreate: Hello");
         NotificationManager notification = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notification.cancel(getIntent().getIntExtra(notification_id, -1));
+        //Increment point
+        MainActivity.incrementPointAndSaveToDb(true, 100);
         finish(); // since finish() is called in onCreate(), onDestroy() will be called immediately
     }
 

@@ -47,7 +47,11 @@ public class SnoozeAlarm extends Service {
         AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(current_time + one_minute, pending_intent);
         alarmManager.setAlarmClock(alarm_info, pending_intent);
 
+        //Stop service after it finishes the task
         stopSelf(startId);
+
+        //Decrement point
+        MainActivity.incrementPointAndSaveToDb(false, 100);
         return START_NOT_STICKY;
     }
 }
