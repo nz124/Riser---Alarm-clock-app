@@ -27,6 +27,11 @@ import android.widget.TimePicker;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     Button setOnButton;
     PendingIntent pending_intent;
     ArrayList alarm_data;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
 
     @Override
@@ -49,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.context = this;
+        //Access database
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("message");
+        myRef.setValue("Hello, World!");
+
 
         //Side nav drawer
         final DrawerLayout drawer_layout = findViewById(R.id.drawer_layout);
@@ -58,19 +70,38 @@ public class MainActivity extends AppCompatActivity {
         //Get information from current user, if there is one.
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        String name = "", email = "";
+        String name = "", email = "", uID = null;
         Uri photoUrl;
 
         if (currentUser != null) {
             name = currentUser.getDisplayName();
             email = currentUser.getEmail();
             photoUrl = currentUser.getPhotoUrl();
+            uID = currentUser.getUid();
         };
         //Set information in the nav's header
         View header_view = navigationView.getHeaderView(0);
         TextView nav_user = header_view.findViewById(R.id.user_name);
-
         nav_user.setText(email);
+
+        incrementPointAndSaveToDb(true, uID);
+        // Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
+                Log.d("", "Value is: " + value);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("", "Failed to read value.", error.toException());
+            }
+        });
+
 
 
         //On click listener for items in the nav drawer
@@ -190,6 +221,13 @@ public class MainActivity extends AppCompatActivity {
             return convertView;
         }
 
+    }
+
+    public void incrementPointAndSaveToDb(Boolean state, String userID){
+        if (state && userID!= null){
+            myRef.setValue("Hello, World!");
+            Log.e("UID", "onCreate: "+ myRef.child("message"));
+        }
     }
 
 

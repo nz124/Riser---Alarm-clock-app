@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -68,12 +69,11 @@ public class alarm_receiver extends BroadcastReceiver {
                 .setContentText("Turn off")
                 .setFullScreenIntent(turn_off_intent, true)
                 .addAction(R.drawable.alarmclock, "Turn Off", turn_off_intent)
-                .addAction(R.drawable.alarmclock, "Snooze", snooze_intent);
-        builder.setSound(Uri.parse("android.resource://"+ context.getPackageName()+"/"+R.raw.apple_ring));
+                .addAction(R.drawable.alarmclock, "Snooze", snooze_intent)
+                .setSound(Uri.parse("android.resource://"+ context.getPackageName()+"/"+R.raw.apple_ring), AudioManager.STREAM_ALARM);
         Notification mNotification = builder.build();
         mNotification.flags = Notification.FLAG_INSISTENT;
         NotificationManagerCompat notification= NotificationManagerCompat.from(context);
-
         notification.notify(notificationId, mNotification);
     }
 }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "647891269506",
+    "firebase_url": "https://riser-alarm.firebaseio.com",
+    "project_id": "riser-alarm",
+    "storage_bucket": "riser-alarm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:647891269506:android:77826f29bf881b72",
+        "android_client_info": {
+          "package_name": "com.example.hello.alarm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "647891269506-6vtkp9tfeucbmftkm23ntinps4t14t07.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hello.alarm",
+            "certificate_hash": "19a1f1989bd348b48b74f63461a438c5da3ac50a"
+          }
+        },
+        {
+          "client_id": "647891269506-esti97e8pqh2i8d9u6s1l517i7fn1ina.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBivACa-OtzFOKg7c3-6jAuJ75fTY4gWeI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "647891269506-esti97e8pqh2i8d9u6s1l517i7fn1ina.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
