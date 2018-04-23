@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.hello.alarm">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/alarmclock"
@@ -27,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".CancelNotification"/>
-        <service android:name=".SnoozeAlarm"/>
+        <activity android:name=".SnoozeAlarm" />
         <receiver android:name=".alarm_receiver"/>
     </application>
 </manifest>

@@ -28,8 +28,11 @@ public class alarm_receiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         cancelIntent = new Intent(context, CancelNotification.class);
+        cancelIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_NEW_TASK);
         snoozeIntent = new Intent(context, SnoozeAlarm.class);
-        showNotification(context);
+        context.startActivity(cancelIntent);
+
+        /*showNotification(context);*/
     }
 
     private void showNotification(Context context){
@@ -61,7 +64,7 @@ public class alarm_receiver extends BroadcastReceiver {
         snoozeIntent.putExtras(extras);
 
         PendingIntent turn_off_intent = PendingIntent.getActivity(context, 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent snooze_intent = PendingIntent.getService(context, 2, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent snooze_intent = PendingIntent.getActivity(context, 2, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.alarmclock)

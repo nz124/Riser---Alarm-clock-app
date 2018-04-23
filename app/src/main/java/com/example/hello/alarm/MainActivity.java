@@ -49,9 +49,9 @@ public class MainActivity extends AppCompatActivity {
     Button setOnButton;
     PendingIntent pending_intent;
     ArrayList alarm_data;
+    Integer current_point;
     static FirebaseDatabase database;
     static DatabaseReference myRef;
-    Integer current_point;
 
 
     @Override
@@ -59,12 +59,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.context = this;
-
-
-
-        //Side nav drawer
-        final DrawerLayout drawer_layout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
 
 
         //Get information from current user, if there is one.
@@ -85,11 +79,26 @@ public class MainActivity extends AppCompatActivity {
         myRef = database.getReference(uID).child("Point");
 
 
+        String action_type = getIntent().getStringExtra("type");
+        if (action_type != null) {
+            if (action_type.equals("turn_off")) {
+                incrementPointAndSaveToDb(true, 100);
+            } else {
+                incrementPointAndSaveToDb(false, 100);
+            }
+            ;
+        }
+
+        //Side nav drawer
+        final DrawerLayout drawer_layout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
 
 
         //Set information in the nav's header
         View header_view = navigationView.getHeaderView(0);
         final TextView nav_user = header_view.findViewById(R.id.user_name);
+
 
         // Read from the database
         myRef.addValueEventListener(new ValueEventListener() {
@@ -101,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 if (current_point != null) {
                     String point_display = String.valueOf(current_point);
                     nav_user.setText(point_display);
+                    Log.e("", "onDataChange: "+current_point+"/"+point_display);
                 }
             }
 
@@ -234,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static void incrementPointAndSaveToDb(final boolean increment, final int point){
+    public void incrementPointAndSaveToDb(final boolean increment, final int point){
         myRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(final MutableData currentData) {
@@ -260,8 +270,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("Success", "Increment successfully");
                 }
             }
-
-
         });
     }
 
