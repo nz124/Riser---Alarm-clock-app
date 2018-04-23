@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(context, "I clicked this button", Toast.LENGTH_LONG).show();
             }
         });
+        //Make the background frame not turn grey
         SlidingPaneLayout sp = findViewById(R.id.slidingPane);
         sp.setSliderFadeColor(getResources().getColor(android.R.color.transparent));
 

@@ -26,7 +26,6 @@ public class MenuListAdapter extends ArrayAdapter<MenuActionItem> {
 
             MenuItemViewHolder viewHolder = new MenuItemViewHolder();
 
-            viewHolder.menuItemImageView = (ImageView) rowView.findViewById(R.id.menu_item_image_view);
             viewHolder.menuItemTextView = (TextView) rowView.findViewById(R.id.menu_item_text_view);
 
             rowView.setTag(viewHolder);
@@ -35,11 +34,15 @@ public class MenuListAdapter extends ArrayAdapter<MenuActionItem> {
         MenuItemViewHolder holder = (MenuItemViewHolder) rowView.getTag();
 
         if (position == MenuActionItem.ITEM1.ordinal()){
-            holder.menuItemImageView.setImageDrawable(activity.getDrawable(R.drawable.star));
-            holder.menuItemTextView.setText("Points");
+            holder.menuItemTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(activity.getDrawable(R.drawable.resized_user), null, null, null);
+            holder.menuItemTextView.setText("User");
         }
         else if (position == MenuActionItem.ITEM2.ordinal()){
-            holder.menuItemImageView.setImageDrawable(activity.getDrawable(R.drawable.friends));
+            holder.menuItemTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(activity.getDrawable(R.drawable.resized_star),null, null, null);
+            holder.menuItemTextView.setText("Point");
+        }
+        else if (position == MenuActionItem.ITEM3.ordinal()){
+            holder.menuItemTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(activity.getDrawable(R.drawable.resized_friends),null, null, null);
             holder.menuItemTextView.setText("Friends");
         }
 
@@ -47,7 +50,7 @@ public class MenuListAdapter extends ArrayAdapter<MenuActionItem> {
     }
 
     private static class MenuItemViewHolder {
-        public ImageView menuItemImageView;
-        public TextView menuItemTextView;
+        TextView menuItemTextView;
+
     }
 }
