@@ -10,8 +10,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,8 +63,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         this.context = this;
 
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context, "I clicked this button", Toast.LENGTH_LONG).show();
+            }
+        });
+        SlidingPaneLayout sp = findViewById(R.id.slidingPane);
+        sp.setSliderFadeColor(getResources().getColor(android.R.color.transparent));
 
-        //Get information from current user, if there is one.
+
+        /*//Get information from current user, if there is one.
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         String name = "", email = "", uID = null;
@@ -94,15 +106,11 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
 
-        //Side nav drawer
-        final DrawerLayout drawer_layout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
 
-
-
+*//*
         //Set information in the nav's header
         View header_view = navigationView.getHeaderView(0);
-        final TextView nav_user = header_view.findViewById(R.id.user_name);
+        final TextView nav_user = header_view.findViewById(R.id.user_name);*//*
 
 
         // Read from the database
@@ -114,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 current_point = dataSnapshot.getValue(Integer.class);
                 if (current_point != null) {
                     String point_display = String.valueOf(current_point);
-                    nav_user.setText(point_display);
+              *//*      nav_user.setText(point_display);*//*
                     Log.e("", "onDataChange: "+current_point+"/"+point_display);
                 }
             }
@@ -129,17 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        //On click listener for items in the nav drawer
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                // set item as selected to persist highlight
-                item.setChecked(true);
-                // close drawer when item is tapped
-                drawer_layout.closeDrawers();
-                return true;
-            }
-        });
 
 
 
@@ -275,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("Success", "Increment successfully");
                 }
             }
-        });
+        });*/
     }
 
 
