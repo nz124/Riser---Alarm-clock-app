@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -80,12 +81,17 @@ public class MainActivity extends AppCompatActivity {
 
 
         String action_type = getIntent().getStringExtra("type");
+        String notification = "";
         if (action_type != null) {
             if (action_type.equals("turn_off")) {
                 incrementPointAndSaveToDb(true, 100);
+                notification = "You gained 100 points";
             } else {
                 incrementPointAndSaveToDb(false, 100);
+                notification = "You lost 100 points";
             };
+            Toast.makeText( this, notification,
+                    Toast.LENGTH_LONG).show();
         }
 
         //Side nav drawer
