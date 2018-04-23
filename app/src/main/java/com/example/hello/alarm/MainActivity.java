@@ -85,8 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 incrementPointAndSaveToDb(true, 100);
             } else {
                 incrementPointAndSaveToDb(false, 100);
-            }
-            ;
+            };
         }
 
         //Side nav drawer

@@ -19,8 +19,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 
 /**
@@ -37,6 +41,16 @@ public class CancelNotification extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.no_view);
+        //Display current time and date
+        TextView time_display = findViewById(R.id.time_display);
+        TextView date_display = findViewById(R.id.date_display);
+        Date currentDate = new Date();
+        String currentTimeString = DateFormat.getTimeInstance(DateFormat.MEDIUM).format(currentDate);
+        String currentDateString = DateFormat.getDateInstance(DateFormat.FULL).format(currentDate);
+        time_display.setText(currentTimeString);
+        date_display.setText(currentDateString);
+
+
         final MediaPlayer mp = MediaPlayer.create(this, R.raw.apple_ring);
         final Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vib.vibrate(500);
