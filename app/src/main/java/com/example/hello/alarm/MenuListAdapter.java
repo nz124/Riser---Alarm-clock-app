@@ -27,7 +27,7 @@ public class MenuListAdapter extends ArrayAdapter<MenuActionItem> {
             MenuItemViewHolder viewHolder = new MenuItemViewHolder();
 
             viewHolder.menuItemTextView = (TextView) rowView.findViewById(R.id.menu_item_text_view);
-
+            viewHolder.menuItemDivider = (View) rowView.findViewById(R.id.divider);
             rowView.setTag(viewHolder);
         }
 
@@ -36,6 +36,7 @@ public class MenuListAdapter extends ArrayAdapter<MenuActionItem> {
         if (position == MenuActionItem.ITEM1.ordinal()){
             holder.menuItemTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(activity.getDrawable(R.drawable.resized_user), null, null, null);
             holder.menuItemTextView.setText("User");
+            holder.menuItemDivider.setVisibility(View.VISIBLE);
         }
         else if (position == MenuActionItem.ITEM2.ordinal()){
             holder.menuItemTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(activity.getDrawable(R.drawable.resized_star),null, null, null);
@@ -51,6 +52,7 @@ public class MenuListAdapter extends ArrayAdapter<MenuActionItem> {
 
     private static class MenuItemViewHolder {
         TextView menuItemTextView;
+        View menuItemDivider;
 
     }
 }
