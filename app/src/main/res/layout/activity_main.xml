@@ -7,29 +7,5 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <!-- Layout to contain contents of main body of screen (drawer will slide over this) -->
-    <FrameLayout
-        android:id="@+id/content_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/add_new_alarm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center|end"
-            android:clickable="true"
-            app:srcCompat="@drawable/alarm_clock" />
-    </FrameLayout>
-
-    <!-- Container for contents of drawer - use NavigationView to make configuration easier -->
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/drawer_view"
-        app:headerLayout="@layout/nav_header" />
 
 </android.support.v4.widget.DrawerLayout>

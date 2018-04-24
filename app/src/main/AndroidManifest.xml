@@ -10,10 +10,9 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/alarmclock"
         android:supportsRtl="true"
-        android:theme="@style/MyMaterialTheme">
+        android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity android:name=".SignInActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat">
+            android:label="@string/app_name">
             <intent-filter>
                 <data android:scheme="@string/fb_login_protocol_scheme" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -25,8 +24,7 @@
         <activity android:name=".SnoozeAlarm" />
         <activity android:name=".AddNewAlarm" />
         <activity android:name=".FragmentPagerSupport"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
