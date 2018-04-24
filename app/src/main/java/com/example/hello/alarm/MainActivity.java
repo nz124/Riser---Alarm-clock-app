@@ -7,7 +7,9 @@ import android.os.Bundle;
 
 
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 
 import android.util.Log;
@@ -263,20 +265,38 @@ public class MainActivity extends Fragment {
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
 
+        // Inflate the layout for this fragment*/
         View view = inflater.inflate(R.layout.activity_main, container, false);
-        //Make the background frame not turn grey
-        PagerEnabledSlidingPaneLayout sp = view.findViewById(R.id.slidingPane);
-        sp.setSliderFadeColor(getResources().getColor(android.R.color.transparent));
 
-        FloatingActionButton fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+
+        FloatingActionButton new_alarm_button = view.findViewById(R.id.add_new_alarm);
+        new_alarm_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getContext(), "I clicked this button", Toast.LENGTH_LONG).show();
             }
         });
 
-        // Inflate the layout for this fragment*/
+        //Handle navigation click events
+        final DrawerLayout mDrawerLayout = view.findViewById(R.id.drawer_layout);
+
+        NavigationView navigationView = view.findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+
+                        return true;
+                    }
+                });
+
         return view;
     }
 

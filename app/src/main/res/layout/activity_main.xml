@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.hello.alarm.PagerEnabledSlidingPaneLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Use DrawerLayout as root container for activity -->
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/slidingPane"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <!--Master fragment-->
-    <fragment
-        android:id="@+id/fragment_master"
-        android:name="com.example.hello.alarm.MasterFragment"
-        android:layout_width="280dp"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true" />
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <!--Detail layout -->
+    <!-- Layout to contain contents of main body of screen (drawer will slide over this) -->
     <FrameLayout
+        android:id="@+id/content_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/mini_drawer">
+        android:layout_height="match_parent" >
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/alarm_clock"
-            app:backgroundTint="@color/transparent_grey_500" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="368dp"
-            android:text="TextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextView"
-            android:textSize="50dp" />
+            android:id="@+id/add_new_alarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center|end"
+            android:clickable="true"
+            app:srcCompat="@drawable/alarm_clock" />
     </FrameLayout>
-</com.example.hello.alarm.PagerEnabledSlidingPaneLayout>
+
+    <!-- Container for contents of drawer - use NavigationView to make configuration easier -->
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:menu="@menu/drawer_view"
+        app:headerLayout="@layout/nav_header" />
+
+</android.support.v4.widget.DrawerLayout>
