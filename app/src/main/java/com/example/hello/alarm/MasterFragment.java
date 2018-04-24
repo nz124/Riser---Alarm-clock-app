@@ -1,5 +1,6 @@
 package com.example.hello.alarm;
 
+import android.app.FragmentManager;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,8 +11,12 @@ public class MasterFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_master, container);
-
         setListAdapter(new MenuListAdapter(R.layout.row_menu_action_item, getActivity(), MenuActionItem.values()));
+        FragmentManager fm = getFragmentManager();
+        if (fm != null) {
+            fm.beginTransaction().remove(this).commit();
+        }
+
 
         return view;
     }

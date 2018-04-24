@@ -36,7 +36,7 @@ public class SignInActivity extends AppCompatActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_in);
-        signed_in_intent = new Intent(this, MainActivity.class);
+        signed_in_intent = new Intent(this, FragmentPagerSupport.class);
 
 
         // Views

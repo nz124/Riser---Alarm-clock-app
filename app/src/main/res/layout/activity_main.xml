@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SlidingPaneLayout
+<com.example.hello.alarm.PagerEnabledSlidingPaneLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/slidingPane"
@@ -9,7 +9,7 @@
     <fragment
         android:id="@+id/fragment_master"
         android:name="com.example.hello.alarm.MasterFragment"
-        android:layout_width="305dp"
+        android:layout_width="280dp"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true" />
 
@@ -21,15 +21,13 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_gravity="bottom|end"
             android:layout_marginBottom="10dp"
             android:layout_marginEnd="10dp"
-            android:src="@drawable/new_alarm"
-            app:backgroundTint="@color/browser_actions_bg_grey" />
+            android:src="@drawable/alarm_clock"
+            app:backgroundTint="@color/transparent_grey_500" />
 
         <TextView
             android:id="@+id/textView"
@@ -38,9 +36,4 @@
             android:text="TextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextViewTextView"
             android:textSize="50dp" />
     </FrameLayout>
-
-
-
-
-
-</android.support.v4.widget.SlidingPaneLayout>
+</com.example.hello.alarm.PagerEnabledSlidingPaneLayout>

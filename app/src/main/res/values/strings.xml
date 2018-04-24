@@ -95,5 +95,8 @@
 
     <string name="font_family_medium">sans-serif-medium</string>
     <string name="font_family_regular">sans-serif</string>
+
+    <string name="first">Go to First</string>
+    <string name="last">Go to Last</string>
 </resources>
 

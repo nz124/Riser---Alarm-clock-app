@@ -3,18 +3,13 @@ package com.example.hello.alarm;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
+
 
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SlidingPaneLayout;
-import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -41,10 +36,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Random;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Fragment {
 
     AlarmManager alarmManager;
     TimePicker timePicker;
@@ -58,21 +54,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        this.context = this;
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(context, "I clicked this button", Toast.LENGTH_LONG).show();
-            }
-        });
-        //Make the background frame not turn grey
-        SlidingPaneLayout sp = findViewById(R.id.slidingPane);
-        sp.setSliderFadeColor(getResources().getColor(android.R.color.transparent));
 
 
         /*//Get information from current user, if there is one.
@@ -275,6 +259,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
     }
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.activity_main, container, false);
+        //Make the background frame not turn grey
+        PagerEnabledSlidingPaneLayout sp = view.findViewById(R.id.slidingPane);
+        sp.setSliderFadeColor(getResources().getColor(android.R.color.transparent));
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "I clicked this button", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Inflate the layout for this fragment*/
+        return view;
+    }
+
 
 
 }
