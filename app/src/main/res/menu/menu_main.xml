@@ -4,7 +4,17 @@
     tools:context="com.example.hello.alarm.MainActivity">
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="1000"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:icon="@drawable/user"
+        android:id="@+id/action_profile"
+        android:orderInCategory="1"
+        android:title="@string/action_profile"
+        app:showAsAction="ifRoom"
+        />
+
+
 </menu>

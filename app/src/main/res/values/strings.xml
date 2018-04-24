@@ -98,5 +98,6 @@
 
     <string name="first">Go to First</string>
     <string name="last">Go to Last</string>
+    <string name="action_profile">Profile</string>
 </resources>
 

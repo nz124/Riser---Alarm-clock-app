@@ -18,6 +18,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,28 +38,13 @@ public class FragmentPagerSupport extends AppCompatActivity {
         setContentView(R.layout.fragment_pager);
 
         ViewPager viewPager = findViewById(R.id.viewpager);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setupViewPager(viewPager);
-        CircleIndicator indicator = findViewById(R.id.indicator);
 
-
-        setSupportActionBar(toolbar);
-        ActionBar actionbar = getSupportActionBar();
-        assert actionbar != null;
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.alarm_clock);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.alarm_clock);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this,
-                mDrawerLayout, toolbar,
-                R.string.common_open_on_phone,
-                R.string.desc_emailpassword);
 
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
-
-
-        indicator.setViewPager(viewPager);
 
         //Handle navigation click events
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -76,6 +63,11 @@ public class FragmentPagerSupport extends AppCompatActivity {
                         return true;
                     }
                 });
+
+        //Circle indicator for view pager
+        CircleIndicator indicator = findViewById(R.id.indicator);
+        setupViewPager(viewPager);
+        indicator.setViewPager(viewPager);
 
     }
 
@@ -118,35 +110,36 @@ public class FragmentPagerSupport extends AppCompatActivity {
         }
     }
 
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
-        super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        // TODO Auto-generated method stub
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        menu.findItem(R.id.action_settings).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Log.e("hey", "DUYy");
+                return true;
+            }
+        });
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO Auto-generated method stub
-        Log.e("hey", "onOptionsItemSelected: "+ item.getItemId());
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        //noinspection SimplifiableIfStatement
+        switch (id) {
+            case R.id.action_profile:
+                return true;
+            case android.R.id.home:
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
-
-
-
 }
