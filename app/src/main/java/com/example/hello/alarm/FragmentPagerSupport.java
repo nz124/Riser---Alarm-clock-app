@@ -1,5 +1,6 @@
 package com.example.hello.alarm;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -130,37 +131,6 @@ public class FragmentPagerSupport extends AppCompatActivity {
         adapter.addFragment(new TwoFragment(), "THREE");
         viewPager.setAdapter(adapter);
     }
-
-
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        final List<Fragment> mFragmentList = new ArrayList<>();
-        final List<String> mFragmentTitleList = new ArrayList<>();
-
-        ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

@@ -53,4 +53,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="WarnButton" parent="@android:style/Widget.Button.Small">
+        <item name="colorButtonNormal">@color/material_red_a200</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
 </resources>
