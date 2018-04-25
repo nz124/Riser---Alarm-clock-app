@@ -1,5 +1,6 @@
 package com.example.hello.alarm;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -14,8 +15,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +40,10 @@ public class FragmentPagerSupport extends AppCompatActivity {
     static final int NUM_ITEMS = 2;
     DrawerLayout mDrawerLayout;
     ActionBarDrawerToggle mDrawerToggle;
+    static FirebaseDatabase database;
+    static DatabaseReference myRef;
+    Integer current_point;
+    NavigationView navigationView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,9 +59,8 @@ public class FragmentPagerSupport extends AppCompatActivity {
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
 
-
         //Handle navigation click events
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -70,12 +86,11 @@ public class FragmentPagerSupport extends AppCompatActivity {
 
     public void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new MainActivity(), "ONE");
+        adapter.addFragment(new AddNewAlarm(), "ONE");
         adapter.addFragment(new OneFragment(), "TWO");
         adapter.addFragment(new TwoFragment(), "THREE");
         viewPager.setAdapter(adapter);
     }
-
 
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -137,5 +152,96 @@ public class FragmentPagerSupport extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void updateUiWithDbData() {
+        //Get information from current user, if there is one.
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String name = "", email = "", uID = null;
+        Uri photoUrl;
+
+        if (currentUser != null) {
+            name = currentUser.getDisplayName();
+            email = currentUser.getEmail();
+            photoUrl = currentUser.getPhotoUrl();
+            uID = currentUser.getUid();
+        }
+        ;
+
+        //Access database
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference(uID).child("Point");
+
+
+        String action_type = getIntent().getStringExtra("type");
+        String notification = "";
+        if (action_type != null) {
+            if (action_type.equals("turn_off")) {
+                incrementPointAndSaveToDb(true, 100);
+                notification = "You gained 100 points";
+            } else {
+                incrementPointAndSaveToDb(false, 100);
+                notification = "You lost 100 points";
+            }
+            ;
+            Toast.makeText(this, notification,
+                    Toast.LENGTH_LONG).show();
+        }
+
+        //Set information in the nav's header
+        View header_view = navigationView.getHeaderView(0);
+        final TextView nav_user = header_view.findViewById(R.id.nav_user);
+
+
+        // Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                current_point = dataSnapshot.getValue(Integer.class);
+                if (current_point != null) {
+                    String point_display = String.valueOf(current_point);
+                    nav_user.setText(point_display);
+                    Log.e("", "onDataChange: " + current_point + "/" + point_display);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w("", "Failed to read value.", error.toException());
+            }
+        });
+    }
+
+
+    public void incrementPointAndSaveToDb(final boolean increment, final Integer point){
+        myRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(final MutableData currentData) {
+                if (currentData.getValue(Integer.class) == null) {
+                    currentData.setValue(0);
+                } else {
+                    if (increment) {
+                        currentData.setValue(currentData.getValue(Integer.class) + point);
+                    } else {
+                        currentData.setValue(currentData.getValue(Integer.class) - point);
+                    }
+                }
+
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    Log.d("Fail:", "Firebase counter increment failed." + databaseError);
+                } else {
+                    Log.d("Success", "Increment successfully");
+                }
+            }
+        });
     }
 }

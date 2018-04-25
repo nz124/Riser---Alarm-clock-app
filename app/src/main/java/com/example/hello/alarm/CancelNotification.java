@@ -55,7 +55,7 @@ public class CancelNotification extends Activity {
         final Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vib.vibrate(500);
         mp.start();
-        final Intent main_activity_intent = new Intent(this, MainActivity.class);
+        final Intent main_activity_intent = new Intent(this, FragmentPagerSupport.class);
 
         Button turn_off_button = findViewById(R.id.turn_off);
         turn_off_button.setOnClickListener(new View.OnClickListener() {
