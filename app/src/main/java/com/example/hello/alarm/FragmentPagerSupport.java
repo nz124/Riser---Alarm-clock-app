@@ -52,9 +52,6 @@ public class FragmentPagerSupport extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_pager);
 
-        //Access database
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference(user_id).child("Point");
 
         //Get information from current user, if there is one.
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -65,6 +62,10 @@ public class FragmentPagerSupport extends AppCompatActivity {
             user_photoUrl = currentUser.getPhotoUrl();
             user_id = currentUser.getUid();
         };
+
+        //Access database and reference to the data of the current's user
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference(user_id).child("Point");
 
         //Determine to increment or decrement point based on the extras being passed in
         String action_type = getIntent().getStringExtra("type");
@@ -196,7 +197,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
     public void updateUiWithDbData(String user_id) {
         //Select information in the nav's header
         View header_view = navigationView.getHeaderView(0);
-        final TextView nav_user = header_view.findViewById(R.id.nav_user);
+        final TextView nav_point = header_view.findViewById(R.id.nav_point);
 
 
         // Read from the database
@@ -209,7 +210,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
                 if (current_point != null) {
                     String point_display = String.valueOf(current_point);
                     //Update point if there are changes
-                    nav_user.setText(point_display);
+                    nav_point.setText(point_display);
                     Log.e("", "onDataChange: " + current_point + "/" + point_display);
                 }
             }

@@ -54,6 +54,7 @@ public class CancelNotification extends Activity {
         final MediaPlayer mp = MediaPlayer.create(this, R.raw.apple_ring);
         final Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         vib.vibrate(500);
+        mp.setLooping(true);
         mp.start();
         final Intent main_activity_intent = new Intent(this, FragmentPagerSupport.class);
 
