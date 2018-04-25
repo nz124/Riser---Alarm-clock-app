@@ -44,14 +44,47 @@ public class FragmentPagerSupport extends AppCompatActivity {
     static DatabaseReference myRef;
     Integer current_point;
     NavigationView navigationView;
+    String user_name, user_email, user_id, user_photoUrlString;
+    Uri user_photoUrl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_pager);
 
-        ViewPager viewPager = findViewById(R.id.viewpager);
+        //Access database
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference(user_id).child("Point");
 
+        //Get information from current user, if there is one.
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            user_name = currentUser.getDisplayName();
+            user_email = currentUser.getEmail();
+            user_photoUrl = currentUser.getPhotoUrl();
+            user_id = currentUser.getUid();
+        };
+
+        //Determine to increment or decrement point based on the extras being passed in
+        String action_type = getIntent().getStringExtra("type");
+        String notification = "";
+        if (action_type != null) {
+            if (action_type.equals("turn_off")) {
+                incrementPointAndSaveToDb(true, 100);
+                notification = "You gained 100 points";
+            } else {
+                incrementPointAndSaveToDb(false, 100);
+                notification = "You lost 100 points";
+            }
+            ;
+            Toast.makeText(this, notification,
+                    Toast.LENGTH_LONG).show();
+        }
+
+
+
+        //Configure action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.alarm_clock);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -77,10 +110,15 @@ public class FragmentPagerSupport extends AppCompatActivity {
                     }
                 });
 
-        //Circle indicator for view pager
+        //Prepare viewpager and add circle indicator for view pager
+        ViewPager viewPager = findViewById(R.id.viewpager);
+
         CircleIndicator indicator = findViewById(R.id.indicator);
         setupViewPager(viewPager);
         indicator.setViewPager(viewPager);
+
+        //Listen for changes from database and update UI
+        updateUiWithDbData(user_id);
 
     }
 
@@ -154,42 +192,9 @@ public class FragmentPagerSupport extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void updateUiWithDbData() {
-        //Get information from current user, if there is one.
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        String name = "", email = "", uID = null;
-        Uri photoUrl;
 
-        if (currentUser != null) {
-            name = currentUser.getDisplayName();
-            email = currentUser.getEmail();
-            photoUrl = currentUser.getPhotoUrl();
-            uID = currentUser.getUid();
-        }
-        ;
-
-        //Access database
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference(uID).child("Point");
-
-
-        String action_type = getIntent().getStringExtra("type");
-        String notification = "";
-        if (action_type != null) {
-            if (action_type.equals("turn_off")) {
-                incrementPointAndSaveToDb(true, 100);
-                notification = "You gained 100 points";
-            } else {
-                incrementPointAndSaveToDb(false, 100);
-                notification = "You lost 100 points";
-            }
-            ;
-            Toast.makeText(this, notification,
-                    Toast.LENGTH_LONG).show();
-        }
-
-        //Set information in the nav's header
+    public void updateUiWithDbData(String user_id) {
+        //Select information in the nav's header
         View header_view = navigationView.getHeaderView(0);
         final TextView nav_user = header_view.findViewById(R.id.nav_user);
 
@@ -203,6 +208,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
                 current_point = dataSnapshot.getValue(Integer.class);
                 if (current_point != null) {
                     String point_display = String.valueOf(current_point);
+                    //Update point if there are changes
                     nav_user.setText(point_display);
                     Log.e("", "onDataChange: " + current_point + "/" + point_display);
                 }
@@ -220,7 +226,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
     public void incrementPointAndSaveToDb(final boolean increment, final Integer point){
         myRef.runTransaction(new Transaction.Handler() {
             @Override
-            public Transaction.Result doTransaction(final MutableData currentData) {
+            public Transaction.Result doTransaction(MutableData currentData) {
                 if (currentData.getValue(Integer.class) == null) {
                     currentData.setValue(0);
                 } else {
