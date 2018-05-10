@@ -50,6 +50,8 @@ public class CancelNotification extends Activity {
         time_display.setText(currentTimeString);
         date_display.setText(currentDateString);
 
+        //Clear the notification on notification bar
+        NotificationManager notificationManager = (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
 
         final MediaPlayer mp = MediaPlayer.create(this, R.raw.apple_ring);
         final Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);

@@ -53,6 +53,8 @@ public class FragmentPagerSupport extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_pager);
 
+        //Access database and reference to the data of the current's user
+        database = FirebaseDatabase.getInstance();
 
         //Get information from current user, if there is one.
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -62,11 +64,14 @@ public class FragmentPagerSupport extends AppCompatActivity {
             user_email = currentUser.getEmail();
             user_photoUrl = currentUser.getPhotoUrl();
             user_id = currentUser.getUid();
+            //Update user's profile
+            writeUserData(user_name, user_photoUrl);
         };
 
-        //Access database and reference to the data of the current's user
-        database = FirebaseDatabase.getInstance();
+
         myRef = database.getReference(user_id).child("Point");
+
+
 
         //Determine to increment or decrement point based on the extras being passed in
         String action_type = getIntent().getStringExtra("type");
@@ -220,5 +225,13 @@ public class FragmentPagerSupport extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void writeUserData(String name, Uri imageUrl) {
+        String mPhotoUri = imageUrl.toString();
+        myRef = database.getReference(user_id).child("Name");
+        myRef.setValue(name);
+        myRef = database.getReference(user_id).child("Photo");
+        myRef.setValue(mPhotoUri);
     }
 }

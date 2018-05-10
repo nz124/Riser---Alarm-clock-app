@@ -72,7 +72,7 @@ import me.relex.circleindicator.CircleIndicator;
 
 public class SignedInActivity extends AppCompatActivity {
     private static final String TAG = "SignedInActivity";
-    private static DatabaseReference myRef;
+    DatabaseReference myRef;
     NavigationView mNavigationView;
     View mHeaderView;
 
@@ -107,7 +107,7 @@ public class SignedInActivity extends AppCompatActivity {
         mNavigationView = findViewById(R.id.nav_view);
         mHeaderView = mNavigationView.getHeaderView(0);
 
-        populateProfile();
+        populateProfile(this);
 //      populateIdpToken(response);
 
 
@@ -129,7 +129,10 @@ public class SignedInActivity extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 updatePointInUi(dataSnapshot.getValue(Integer.class));
-                }
+                populateProfile(getApplicationContext());
+                //      populateIdpToken(response);
+
+            }
 
             @Override
             public void onCancelled(DatabaseError error) {
@@ -286,14 +289,14 @@ public class SignedInActivity extends AppCompatActivity {
                 });
     }
 
-    private void populateProfile() {
+    private void populateProfile(Context context) {
         final ImageView mUserProfilePicture = mHeaderView.findViewById(R.id.nav_profile_image);
         final TextView mUserDisplayName = mHeaderView.findViewById(R.id.nav_display_name);
 
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user.getPhotoUrl() != null) {
-            Glide.with(this)
+            Glide.with(context)
                     .load(user.getPhotoUrl())
                     .into(mUserProfilePicture);
         }

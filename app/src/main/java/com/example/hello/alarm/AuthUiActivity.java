@@ -212,13 +212,13 @@ public class AuthUiActivity extends AppCompatActivity {
         startActivity(SignedInActivity.createIntent(this, response));
     }
 
-    @OnClick({R.id.default_theme, R.id.purple_theme, R.id.green_theme, R.id.dark_theme})
-    public void toggleDarkTheme() {
-        int mode = mUseDarkTheme.isChecked() ?
-                AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_AUTO;
-        AppCompatDelegate.setDefaultNightMode(mode);
-        getDelegate().setLocalNightMode(mode);
-    }
+//    @OnClick({R.id.default_theme, R.id.purple_theme, R.id.green_theme, R.id.dark_theme})
+//    public void toggleDarkTheme() {
+//        int mode = mUseDarkTheme.isChecked() ?
+//                AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_AUTO;
+//        AppCompatDelegate.setDefaultNightMode(mode);
+//        getDelegate().setLocalNightMode(mode);
+//    }
 
     @StyleRes
     private int getSelectedTheme() {

@@ -1,15 +1,21 @@
 package com.example.hello.alarm;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 
@@ -55,13 +61,23 @@ public class AddNewAlarm extends Fragment {
     Integer current_point;
     static FirebaseDatabase database;
     static DatabaseReference myRef;
+    String channelId;
+    PendingIntent turn_off_intent;
+    PendingIntent snooze_intent;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        channelId = "alarm_channel";
         alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
+
+        Intent cancelIntent = new Intent(getContext(), CancelNotification.class);
+        cancelIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent snoozeIntent = new Intent(getContext(), SnoozeAlarm.class);
+        turn_off_intent = PendingIntent.getActivity(getContext(), 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        snooze_intent = PendingIntent.getActivity(getContext(), 2, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
     }
     @Override
@@ -73,6 +89,7 @@ public class AddNewAlarm extends Fragment {
 
 
         timePicker = view.findViewById(R.id.timePicker);
+
         //Create array of all alarm to show on the list view
         alarm_data = new ArrayList<>();
         final AlarmAdapter adapter = new AlarmAdapter(getContext(), R.layout.listitem, alarm_data);
@@ -88,17 +105,16 @@ public class AddNewAlarm extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
-                Date current_date = new Date();
-                calendar.set(Calendar.DATE, current_date.getDate());
+                Calendar current_time = Calendar.getInstance();
+                calendar.set(Calendar.DATE, current_time.get(Calendar.DATE));
                 calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
                 calendar.set(Calendar.MINUTE, timePicker.getMinute());
                 calendar.set(Calendar.SECOND, 0);
                 Log.e("Time", "onClick: " + calendar.getTime());
-                if (calendar.before(Calendar.getInstance())) {
+                if (calendar.before(current_time)) {
                     calendar.add(Calendar.DATE, 1);
                     Log.e("Time", "onClick: " + calendar.getTime());
-                }
-                ;
+                };
 
                 int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
@@ -111,10 +127,23 @@ public class AddNewAlarm extends Fragment {
                 AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_intent);
                 alarmManager.setAlarmClock(alarm_info, pending_intent);
 
-
                 //Add alarm to list view
                 alarm newAlarm = new alarm(pending_intent, hour, minute);
                 adapter.add(newAlarm);
+
+
+                //Show a persistent notification on notification bar
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), channelId)
+                        .setSmallIcon(R.drawable.alarmclock)
+                        .setContentTitle(newAlarm.time_string)
+                        .setContentText("You have the next alarm at " + newAlarm.time_string)
+                        .setPriority(NotificationManagerCompat.IMPORTANCE_LOW)
+                        .addAction(R.drawable.alarmclock, "Turn Off", turn_off_intent)
+                        .addAction(R.drawable.alarmclock, "Add 10 minutes", snooze_intent);
+                Notification mNotification = builder.build();
+                mNotification.flags = Notification.FLAG_NO_CLEAR;
+                NotificationManagerCompat notification= NotificationManagerCompat.from(getContext());
+                notification.notify(alarm_id, mNotification);
             }
         });
         return view;
@@ -135,12 +164,12 @@ public class AddNewAlarm extends Fragment {
             hour_string = String.valueOf(hour);
             minute_string = minute < 10 ? "0" + String.valueOf(minute) : String.valueOf(minute);
             this.time_string = hour_string + " : " + minute_string;
-            Log.e("alarm", "alarm: " + this.time_string);
         }
 
     }
 
     public class AlarmAdapter extends ArrayAdapter<alarm> {
+
         AlarmAdapter(Context context, int listViewResource, ArrayList<alarm> alarms) {
             super(context, R.layout.listitem, alarms);
         }
@@ -156,11 +185,13 @@ public class AddNewAlarm extends Fragment {
             TextView tvTime = convertView.findViewById(R.id.tvTime);
             Switch switchButton = convertView.findViewById(R.id.switchButton);
             Button removeButton = convertView.findViewById(R.id.remove_button);
+
+
             switchButton.setChecked(true);
             removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Remove the alarm from AlarmManager and from ListView]'
+                    //Remove the alarm from AlarmManager and from ListView
                     alarmManager.cancel(alarm != null ? alarm.alarm_pending_intent : null);
                     alarm_data.remove(position);
                     notifyDataSetChanged();
