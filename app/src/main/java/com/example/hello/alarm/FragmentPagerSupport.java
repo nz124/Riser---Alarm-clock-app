@@ -17,10 +17,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -47,11 +49,22 @@ public class FragmentPagerSupport extends AppCompatActivity {
     NavigationView navigationView;
     String user_name, user_email, user_id, user_photoUrlString;
     Uri user_photoUrl;
+    //Select information in the nav's header
+    View header_view;
+    TextView nav_point;
+    ImageView nav_photo;
+    Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_pager);
+
+        this.context = this;
+        navigationView = findViewById(R.id.nav_view);
+        header_view = navigationView.getHeaderView(0);
+        nav_point = header_view.findViewById(R.id.nav_point);
+        nav_photo = header_view.findViewById(R.id.nav_profile_image);
 
         //Access database and reference to the data of the current's user
         database = FirebaseDatabase.getInstance();
@@ -70,6 +83,26 @@ public class FragmentPagerSupport extends AppCompatActivity {
 
 
         myRef = database.getReference(user_id).child("Point");
+        // Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+             @Override
+             public void onDataChange(DataSnapshot dataSnapshot) {
+                 // This method is called once with the initial value and again
+                 // whenever data at this location is updated.
+                 current_point = dataSnapshot.getValue(Integer.class);
+                 if (current_point != null) {
+                     String point_display = String.valueOf(current_point);
+                     //Update point if there are changes
+                     nav_point.setText(point_display);
+                 }
+             }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Failed to read value
+                Log.w("", "Failed to read value.", databaseError.toException());
+            }
+        });
 
 
 
@@ -100,7 +133,6 @@ public class FragmentPagerSupport extends AppCompatActivity {
 
 
         //Handle navigation click events
-        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -170,23 +202,20 @@ public class FragmentPagerSupport extends AppCompatActivity {
 
 
     public void updateUiWithDbData(String user_id) {
-        //Select information in the nav's header
-        View header_view = navigationView.getHeaderView(0);
-        final TextView nav_point = header_view.findViewById(R.id.nav_point);
-
-
         // Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 current_point = dataSnapshot.getValue(Integer.class);
+                Glide.with(context)
+                        .load(user_photoUrl)
+                        .into(nav_photo);
                 if (current_point != null) {
                     String point_display = String.valueOf(current_point);
                     //Update point if there are changes
                     nav_point.setText(point_display);
-                    Log.e("", "onDataChange: " + current_point + "/" + point_display);
                 }
             }
 
