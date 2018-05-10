@@ -55,6 +55,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
     ImageView nav_photo;
     Context context;
     Uri defaultUri;
+    Uri mPhotoUri;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -211,9 +212,15 @@ public class FragmentPagerSupport extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
+                if (dataSnapshot.child("Photo").getValue()  != null) {
+                    Uri mPhotoUri = Uri.parse(dataSnapshot.child("Photo").getValue().toString());
+                }
+                else {
+                    Uri mPhotoUri = defaultUri;
+                };
                 current_point = dataSnapshot.getValue(Integer.class);
                 Glide.with(context)
-                        .load(user_photoUrl)
+                        .load(mPhotoUri)
                         .into(nav_photo);
                 if (current_point != null) {
                     String point_display = String.valueOf(current_point);
