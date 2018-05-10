@@ -162,7 +162,6 @@ public class SignedInActivity extends AppCompatActivity {
 
         //Configure action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.alarm_clock);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 

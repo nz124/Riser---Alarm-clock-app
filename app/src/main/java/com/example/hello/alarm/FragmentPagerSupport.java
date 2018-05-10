@@ -4,9 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -130,7 +127,6 @@ public class FragmentPagerSupport extends AppCompatActivity {
 
         //Configure action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.alarm_clock);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);

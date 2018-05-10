@@ -19,7 +19,10 @@
         android:layout_width="233dp"
         android:layout_height="56dp"
         android:layout_marginStart="8dp"
+        android:gravity="fill_vertical|center_horizontal"
         android:text="TextView"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/imageView"
         tools:layout_editor_absoluteY="-2dp" />
 
@@ -27,7 +30,9 @@
         android:id="@+id/friend_point"
         android:layout_width="85dp"
         android:layout_height="55dp"
+        android:gravity="center_vertical|center_horizontal"
         android:text="TextView"
+        android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/textView"
         tools:layout_editor_absoluteY="0dp" />
 </LinearLayout>
