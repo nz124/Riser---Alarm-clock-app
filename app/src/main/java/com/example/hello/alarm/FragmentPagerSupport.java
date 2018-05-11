@@ -49,6 +49,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
     //Select information in the nav's header
     View header_view;
     TextView nav_point;
+    TextView nav_name;
     ImageView nav_photo;
     Context context;
     Uri defaultUri;
@@ -66,6 +67,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
         header_view = navigationView.getHeaderView(0);
         nav_point = header_view.findViewById(R.id.nav_point);
         nav_photo = header_view.findViewById(R.id.nav_profile_image);
+        nav_name = header_view.findViewById(R.id.nav_display_name);
 
         //Access database and reference to the data of the current's user
         database = FirebaseDatabase.getInstance();
@@ -81,30 +83,6 @@ public class FragmentPagerSupport extends AppCompatActivity {
             //Update user's profile
             writeUserData(user_name, user_photoUrl);
         };
-
-
-        myRef = database.getReference(user_id).child("Point");
-        // Read from the database
-        myRef.addValueEventListener(new ValueEventListener() {
-             @Override
-             public void onDataChange(DataSnapshot dataSnapshot) {
-                 // This method is called once with the initial value and again
-                 // whenever data at this location is updated.
-                 current_point = dataSnapshot.getValue(Integer.class);
-                 if (current_point != null) {
-                     String point_display = String.valueOf(current_point);
-                     //Update point if there are changes
-                     nav_point.setText(point_display);
-                 }
-             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Failed to read value
-                Log.w("", "Failed to read value.", databaseError.toException());
-            }
-        });
-
 
 
         //Determine to increment or decrement point based on the extras being passed in
@@ -201,24 +179,20 @@ public class FragmentPagerSupport extends AppCompatActivity {
     }
 
 
-    public void updateUiWithDbData(String user_id) {
+    public void updateUiWithDbData(final String user_id) {
         // Read from the database
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child(user_id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                if (dataSnapshot.child("Photo").getValue()  != null) {
-                    Uri mPhotoUri = Uri.parse(dataSnapshot.child("Photo").getValue().toString());
-                }
-                else {
-                    Uri mPhotoUri = defaultUri;
-                };
-                current_point = dataSnapshot.getValue(Integer.class);
+                mPhotoUri = Uri.parse(dataSnapshot.child("Photo").getValue().toString());
+                current_point = dataSnapshot.child("Point").getValue(Integer.class);
                 Glide.with(context)
                         .load(mPhotoUri)
                         .into(nav_photo);
-                if (current_point != null) {
+                nav_name.setText(dataSnapshot.child("Name").getValue().toString());
+                if (current_point != null){
                     String point_display = String.valueOf(current_point);
                     //Update point if there are changes
                     nav_point.setText("Current point: " + point_display);
@@ -235,6 +209,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
 
 
     public void incrementPointAndSaveToDb(final boolean increment, final Integer point){
+        myRef = database.getReference(user_id).child("Point");
         myRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData currentData) {
@@ -270,7 +245,6 @@ public class FragmentPagerSupport extends AppCompatActivity {
         else {
             mPhotoUri = defaultUri.toString();
         }
-
         myRef = database.getReference(user_id).child("Name");
         myRef.setValue(name);
         myRef = database.getReference(user_id).child("Photo");
