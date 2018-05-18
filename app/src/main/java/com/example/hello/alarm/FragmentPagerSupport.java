@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -29,9 +28,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import me.relex.circleindicator.CircleIndicator;
 
@@ -141,7 +137,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
 
     public void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new AddNewAlarm(), "ONE");
+        adapter.addFragment(new AlarmList(), "ONE");
         adapter.addFragment(new OneFragment(), "TWO");
         adapter.addFragment(new TwoFragment(), "THREE");
         viewPager.setAdapter(adapter);
@@ -188,9 +184,9 @@ public class FragmentPagerSupport extends AppCompatActivity {
                 // whenever data at this location is updated.
                 mPhotoUri = Uri.parse(dataSnapshot.child("Photo").getValue().toString());
                 current_point = dataSnapshot.child("Point").getValue(Integer.class);
-                Glide.with(context)
-                        .load(mPhotoUri)
-                        .into(nav_photo);
+//                Glide.with(context)
+//                        .load(mPhotoUri)
+//                        .into(nav_photo);
                 nav_name.setText(dataSnapshot.child("Name").getValue().toString());
                 if (current_point != null){
                     String point_display = String.valueOf(current_point);
@@ -213,16 +209,15 @@ public class FragmentPagerSupport extends AppCompatActivity {
         myRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData currentData) {
-                if (currentData.getValue(Integer.class) == null) {
+                if (Integer.valueOf(currentData.getValue().toString()) == 0) {
                     currentData.setValue(0);
                 } else {
                     if (increment) {
-                        currentData.setValue(currentData.getValue(Integer.class) + point);
+                        currentData.setValue(Integer.valueOf(currentData.getValue().toString()) + point);
                     } else {
-                        currentData.setValue(currentData.getValue(Integer.class) - point);
+                        currentData.setValue(Integer.valueOf(currentData.getValue().toString()) - point);
                     }
                 }
-
                 return Transaction.success(currentData);
             }
 

@@ -67,7 +67,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import me.relex.circleindicator.CircleIndicator;
 
 public class SignedInActivity extends AppCompatActivity {
@@ -172,7 +171,7 @@ public class SignedInActivity extends AppCompatActivity {
 
     public void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new AddNewAlarm(), "ONE");
+        adapter.addFragment(new AlarmList(), "ONE");
         adapter.addFragment(new OneFragment(), "TWO");
         adapter.addFragment(new TwoFragment(), "THREE");
         viewPager.setAdapter(adapter);
