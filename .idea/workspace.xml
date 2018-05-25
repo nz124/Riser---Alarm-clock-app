@@ -36,11 +36,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="FragmentPagerSupport.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="FragmentPagerSupport.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/FragmentPagerSupport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="249">
-              <caret line="108" column="39" lean-forward="true" selection-start-line="108" selection-start-column="39" selection-end-line="108" selection-end-column="39" />
+            <state relative-caret-position="332">
+              <caret line="280" column="26" lean-forward="false" selection-start-line="280" selection-start-column="26" selection-end-line="280" selection-end-column="26" />
               <folding>
                 <element signature="e#13176#13975#0" expanded="true" />
                 <element signature="e#13974#13975#0" expanded="true" />
@@ -74,11 +74,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AlarmList.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="AlarmList.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/AlarmList.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="32" column="53" lean-forward="true" selection-start-line="32" selection-start-column="53" selection-end-line="32" selection-end-column="53" />
+            <state relative-caret-position="-1445">
+              <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -137,7 +137,7 @@
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/OneFragment.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="177">
-              <caret line="81" column="55" lean-forward="true" selection-start-line="81" selection-start-column="55" selection-end-line="81" selection-end-column="55" />
+              <caret line="81" column="55" lean-forward="false" selection-start-line="81" selection-start-column="55" selection-end-line="81" selection-end-column="55" />
               <folding />
             </state>
           </provider>
@@ -166,7 +166,6 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>populateProfile</find>
-      <find>writeUserData</find>
       <find>updateUi</find>
       <find>nav</find>
       <find>user_photoURL</find>
@@ -195,6 +194,7 @@
       <find>navigation</find>
       <find>updateUI</find>
       <find>alarm_id</find>
+      <find>writeUserData</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2994,16 +2994,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/FragmentPagerSupport.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/OneFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="249">
-          <caret line="108" column="39" lean-forward="true" selection-start-line="108" selection-start-column="39" selection-end-line="108" selection-end-column="39" />
-          <folding>
-            <element signature="e#13176#13975#0" expanded="true" />
-            <element signature="e#13974#13975#0" expanded="true" />
-            <element signature="e#15552#16321#0" expanded="true" />
-            <element signature="e#16320#16321#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="177">
+          <caret line="81" column="55" lean-forward="false" selection-start-line="81" selection-start-column="55" selection-end-line="81" selection-end-column="55" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -3015,19 +3010,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/OneFragment.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/AlarmList.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="81" column="55" lean-forward="true" selection-start-line="81" selection-start-column="55" selection-end-line="81" selection-end-column="55" />
+        <state relative-caret-position="-1445">
+          <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/AlarmList.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/FragmentPagerSupport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="32" column="53" lean-forward="true" selection-start-line="32" selection-start-column="53" selection-end-line="32" selection-end-column="53" />
-          <folding />
+        <state relative-caret-position="332">
+          <caret line="280" column="26" lean-forward="false" selection-start-line="280" selection-start-column="26" selection-end-line="280" selection-end-column="26" />
+          <folding>
+            <element signature="e#13176#13975#0" expanded="true" />
+            <element signature="e#13974#13975#0" expanded="true" />
+            <element signature="e#15552#16321#0" expanded="true" />
+            <element signature="e#16320#16321#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

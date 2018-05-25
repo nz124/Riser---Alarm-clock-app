@@ -277,5 +277,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
         myRef.setValue(name);
         myRef = database.getReference(user_id).child("Photo");
         myRef.setValue(mPhotoUri);
+        myRef = database.getReference(user_id).child("Point");
+        myRef.setValue(0);
     }
 }
