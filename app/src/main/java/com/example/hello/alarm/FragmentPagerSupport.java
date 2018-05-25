@@ -264,10 +264,9 @@ public class FragmentPagerSupport extends AppCompatActivity {
 
     public void writeUserData(String name, Uri imageUrl) {
         String mPhotoUri;
-        if (imageUrl != null){
+        if (imageUrl != null) {
             mPhotoUri = imageUrl.toString();
-        }
-        else {
+        } else {
             mPhotoUri = defaultUri.toString();
         }
         myRef = database.getReference(user_id).child("Name");
@@ -275,6 +274,19 @@ public class FragmentPagerSupport extends AppCompatActivity {
         myRef = database.getReference(user_id).child("Photo");
         myRef.setValue(mPhotoUri);
         myRef = database.getReference(user_id).child("Point");
-        myRef.setValue(0);
+        //Initilize point for first time user
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue().toString().equals("")) {
+                    myRef.setValue(0);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //...
+            }
+        });
     }
 }
