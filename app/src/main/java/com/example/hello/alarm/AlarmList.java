@@ -62,15 +62,6 @@ public class AlarmList extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        alarmManager = (AlarmManager) getActivity().getSystemService(ALARM_SERVICE);
-        channelId = "alarm_channel";
-        calendar = Calendar.getInstance();
-        snoozeIntent = new Intent(getContext(), SnoozeAlarm.class);
-        cancelIntent = new Intent(getContext(), CancelNotification.class);
-        cancelIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_NEW_TASK);
-        turn_off_intent = PendingIntent.getActivity(getContext(), 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        snooze_intent = PendingIntent.getActivity(getContext(), 2, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
 
         //Create array of all alarm to show on the list view
         alarm_data = new ArrayList<>();
@@ -163,16 +154,24 @@ public class AlarmList extends Fragment {
         //Alarm Id
         int alarm_id = new Random().nextInt();
 
+        alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        calendar = Calendar.getInstance();
+        snoozeIntent = new Intent(context, SnoozeAlarm.class);
+        cancelIntent = new Intent(context, CancelNotification.class);
+        cancelIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_NEW_TASK);
+        turn_off_intent = PendingIntent.getActivity(context, 1, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        snooze_intent = PendingIntent.getActivity(context, 2, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         //Set calendar's time for the alarm
-        calendar.set(Calendar.HOUR, hour);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
 
 
         final Intent alarm_intent = new Intent(context, alarm_receiver.class);
         alarm_intent.putExtra("alarm_id", alarm_id);
         PendingIntent pending_intent = PendingIntent.getBroadcast(context, alarm_id, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_intent);
+        Log.e("hhh", "AddAlarm: "+alarm_info.getTriggerTime() );
         alarmManager.setAlarmClock(alarm_info, pending_intent);
 
         //Add alarm to list view

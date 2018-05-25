@@ -3,6 +3,8 @@ package com.example.hello.alarm;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -19,6 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +33,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.UUID;
 
 import me.relex.circleindicator.CircleIndicator;
 
@@ -40,6 +47,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
     static DatabaseReference myRef;
     Integer current_point;
     NavigationView navigationView;
+    FirebaseUser currentUser;
     String user_name, user_email, user_id, user_photoUrlString;
     Uri user_photoUrl;
     //Select information in the nav's header
@@ -50,6 +58,7 @@ public class FragmentPagerSupport extends AppCompatActivity {
     Context context;
     Uri defaultUri;
     Uri mPhotoUri;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,16 +78,40 @@ public class FragmentPagerSupport extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
 
         //Get information from current user, if there is one.
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            user_name = currentUser.getDisplayName();
-            user_email = currentUser.getEmail();
-            user_photoUrl = currentUser.getPhotoUrl();
-            user_id = currentUser.getUid();
-            //Update user's profile
-            writeUserData(user_name, user_photoUrl);
-        };
+        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            mAuth.signInAnonymously();
+            currentUser = mAuth.getCurrentUser();
+        }
+        mAuth.signInAnonymously()
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update user information
+                            currentUser = mAuth.getCurrentUser();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("Error", "signInAnonymously:failure", task.getException());
+                            Toast.makeText(FragmentPagerSupport.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        // ...
+                    }
+                });
+        Log.e("info", "onCreate: "+ currentUser.getDisplayName() );
+
+        user_name = (currentUser.getDisplayName().equals("")) ? "Guest": currentUser.getDisplayName();
+        user_email = (currentUser.getEmail() == null) ? "No Email Provided": currentUser.getEmail();
+        user_photoUrl = (currentUser.getPhotoUrl() == null) ? defaultUri: currentUser.getPhotoUrl();
+        user_id = currentUser.getUid();
+        //Update user's profile
+        writeUserData(user_name, user_photoUrl);
+
+        //Listen for changes from database and update UI
+        updateUiWithDbData(user_id);
 
 
         //Determine to increment or decrement point based on the extras being passed in
@@ -115,7 +148,9 @@ public class FragmentPagerSupport extends AppCompatActivity {
                         menuItem.setChecked(true);
                         // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
-
+                        if (menuItem.getItemId() == R.id.nav_sign_out){
+                            mAuth.signOut();
+                        }
                         // Add code here to update the UI based on the item selected
                         // For example, swap UI fragments here
 
@@ -130,8 +165,6 @@ public class FragmentPagerSupport extends AppCompatActivity {
         setupViewPager(viewPager);
         indicator.setViewPager(viewPager);
 
-        //Listen for changes from database and update UI
-        updateUiWithDbData(user_id);
 
     }
 
