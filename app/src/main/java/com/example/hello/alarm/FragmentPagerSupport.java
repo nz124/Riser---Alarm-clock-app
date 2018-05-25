@@ -107,7 +107,8 @@ public class FragmentPagerSupport extends AppCompatActivity {
         user_email = (currentUser.getEmail() == null) ? "No Email Provided": currentUser.getEmail();
         user_photoUrl = (currentUser.getPhotoUrl() == null) ? defaultUri: currentUser.getPhotoUrl();
         user_id = currentUser.getUid();
-        //Update user's profile
+
+        //Write user's profile to database
         writeUserData(user_name, user_photoUrl);
 
         //Listen for changes from database and update UI
@@ -242,14 +243,10 @@ public class FragmentPagerSupport extends AppCompatActivity {
         myRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData currentData) {
-                if (Integer.valueOf(currentData.getValue().toString()) == 0) {
-                    currentData.setValue(0);
+                if (increment) {
+                    currentData.setValue(Integer.valueOf(currentData.getValue().toString()) + point);
                 } else {
-                    if (increment) {
-                        currentData.setValue(Integer.valueOf(currentData.getValue().toString()) + point);
-                    } else {
-                        currentData.setValue(Integer.valueOf(currentData.getValue().toString()) - point);
-                    }
+                    currentData.setValue(Integer.valueOf(currentData.getValue().toString()) - point);
                 }
                 return Transaction.success(currentData);
             }

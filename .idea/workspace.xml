@@ -39,13 +39,13 @@
       <file leaf-file-name="FragmentPagerSupport.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/FragmentPagerSupport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="332">
-              <caret line="280" column="26" lean-forward="false" selection-start-line="280" selection-start-column="26" selection-end-line="280" selection-end-column="26" />
+            <state relative-caret-position="187">
+              <caret line="244" column="78" lean-forward="false" selection-start-line="244" selection-start-column="78" selection-end-line="244" selection-end-column="78" />
               <folding>
                 <element signature="e#13176#13975#0" expanded="true" />
                 <element signature="e#13974#13975#0" expanded="true" />
-                <element signature="e#15552#16321#0" expanded="true" />
-                <element signature="e#16320#16321#0" expanded="true" />
+                <element signature="e#15564#16333#0" expanded="true" />
+                <element signature="e#16332#16333#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -178,7 +178,6 @@
       <find>nav_point</find>
       <find>increment</find>
       <find>point</find>
-      <find>user_id</find>
       <find>incrementPoint</find>
       <find>Fragment</find>
       <find>pending_inte</find>
@@ -195,6 +194,7 @@
       <find>updateUI</find>
       <find>alarm_id</find>
       <find>writeUserData</find>
+      <find>user_id</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2573,8 +2573,8 @@
           <folding>
             <element signature="e#13176#13975#0" expanded="true" />
             <element signature="e#13974#13975#0" expanded="true" />
-            <element signature="e#15552#16321#0" expanded="true" />
-            <element signature="e#16320#16321#0" expanded="true" />
+            <element signature="e#15564#16333#0" expanded="true" />
+            <element signature="e#16332#16333#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2672,8 +2672,8 @@
           <folding>
             <element signature="e#13176#13975#0" expanded="true" />
             <element signature="e#13974#13975#0" expanded="true" />
-            <element signature="e#15552#16321#0" expanded="true" />
-            <element signature="e#16320#16321#0" expanded="true" />
+            <element signature="e#15564#16333#0" expanded="true" />
+            <element signature="e#16332#16333#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2733,8 +2733,8 @@
           <folding>
             <element signature="e#13176#13975#0" expanded="true" />
             <element signature="e#13974#13975#0" expanded="true" />
-            <element signature="e#15552#16321#0" expanded="true" />
-            <element signature="e#16320#16321#0" expanded="true" />
+            <element signature="e#15564#16333#0" expanded="true" />
+            <element signature="e#16332#16333#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -2802,8 +2802,8 @@
           <folding>
             <element signature="e#13176#13975#0" expanded="true" />
             <element signature="e#13974#13975#0" expanded="true" />
-            <element signature="e#15552#16321#0" expanded="true" />
-            <element signature="e#16320#16321#0" expanded="true" />
+            <element signature="e#15564#16333#0" expanded="true" />
+            <element signature="e#16332#16333#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -3020,13 +3020,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/FragmentPagerSupport.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="332">
-          <caret line="280" column="26" lean-forward="false" selection-start-line="280" selection-start-column="26" selection-end-line="280" selection-end-column="26" />
+        <state relative-caret-position="187">
+          <caret line="244" column="78" lean-forward="false" selection-start-line="244" selection-start-column="78" selection-end-line="244" selection-end-column="78" />
           <folding>
             <element signature="e#13176#13975#0" expanded="true" />
             <element signature="e#13974#13975#0" expanded="true" />
-            <element signature="e#15552#16321#0" expanded="true" />
-            <element signature="e#16320#16321#0" expanded="true" />
+            <element signature="e#15564#16333#0" expanded="true" />
+            <element signature="e#16332#16333#0" expanded="true" />
           </folding>
         </state>
       </provider>
