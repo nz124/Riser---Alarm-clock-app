@@ -20,7 +20,7 @@
                 <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
         </activity>
-        <activity android:name=".AuthUiActivity"/>
+        <activity android:name=".SignInActivity"/>
 
         <activity android:name=".AlarmNotification"/>
         <activity android:name=".SnoozeAlarm" />

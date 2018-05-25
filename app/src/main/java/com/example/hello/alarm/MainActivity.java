@@ -21,11 +21,16 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.util.ExtraConstants;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthCredential;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     Uri defaultUri;
     Uri mPhotoUri;
     private FirebaseAuth mAuth;
+    AuthCredential credential;
 
     public static Intent createIntent(Context context, IdpResponse idpResponse) {
         return new Intent().setClass(context, MainActivity.class)
@@ -93,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Sign user in anonymously
         if (currentUser == null) {
+            nav_sign_in.setVisible(true);
             mAuth.signInAnonymously()
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -118,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
             //Listen for changes from database and update UI
             updateUiWithDbData(currentUser);
             //Display sign in and sign out buttons properly based on authentication status
-            Log.e("hi", "onCreate: "+currentUser.getDisplayName() );
             if (currentUser.getDisplayName().equals("")){
                 nav_sign_in.setVisible(true);
                 nav_sign_out.setVisible(false);
@@ -126,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
                 nav_sign_out.setVisible(true);
                 nav_sign_in.setVisible(false);
             }
+            linkAccount();
         }
-
 
 
 
@@ -151,9 +157,8 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+
         mDrawerLayout = findViewById(R.id.drawer_layout);
-
-
         //Handle navigation click events
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -165,15 +170,15 @@ public class MainActivity extends AppCompatActivity {
                         mDrawerLayout.closeDrawers();
                         switch(menuItem.getItemId()) {
                             case R.id.nav_sign_in:
-                                startActivity(AuthUiActivity.createIntent(context));
+                                startActivity(SignInActivity.createIntent(context));
                                 break;
                             case R.id.nav_sign_out:
                                 mAuth.signOut();
                                 Toast.makeText(context, "Sign out succesfully", Toast.LENGTH_LONG).show();
+                                nav_sign_in.setVisible(true);
                         }
                         // Add code here to update the UI based on the item selected
                         // For example, swap UI fragments here
-
                         return true;
                     }
                 });
@@ -283,29 +288,66 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void writeUserData(FirebaseUser user) {
-        String mName, mPhotoUriString, user_id;
-        user_id = user.getUid();
-        mName = (user.getDisplayName().equals("")) ? "Guest": user.getDisplayName();
-        mPhotoUri = (user.getPhotoUrl() == null) ? defaultUri: user.getPhotoUrl();
-        mPhotoUriString = mPhotoUri.toString();
-        myRef = database.getReference(user_id).child("Name");
-        myRef.setValue(mName);
-        myRef = database.getReference(user_id).child("Photo");
-        myRef.setValue(mPhotoUriString);
-        myRef = database.getReference(user_id).child("Point");
-        //Initialize point for first time user
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null) {
-                    myRef.setValue(0);
-                }
-            }
+        if (user != null) {
+            String mName, mPhotoUriString, user_id;
+            user_id = user.getUid();
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //...
+            mName = (user.getDisplayName() == "") ? "Guest" : user.getDisplayName();
+            mPhotoUri = (user.getPhotoUrl() == null) ? defaultUri : user.getPhotoUrl();
+            mPhotoUriString = mPhotoUri.toString();
+            myRef = database.getReference(user_id).child("Name");
+            myRef.setValue(mName);
+            myRef = database.getReference(user_id).child("Photo");
+            myRef.setValue(mPhotoUriString);
+            myRef = database.getReference(user_id).child("Point");
+            //Initialize point for first time user
+            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.getValue() == null) {
+                        myRef.setValue(0);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    //...
+                }
+            });
+        }
+    }
+
+    public void linkAccount(){
+        Bundle login_bundle = getIntent().getExtras();
+        String provider_type = login_bundle.getString("provider_type");
+        String auth_token = login_bundle.getString("auth_token");
+        Log.e("hey", "linkAccount: "+ provider_type + auth_token );
+        if (provider_type != null && auth_token != null){
+            if (provider_type.equals("facebook.com")) {
+                credential = FacebookAuthProvider.getCredential(auth_token);
             }
-        });
+            else if (provider_type.equals("google.com")){
+                credential = GoogleAuthProvider.getCredential(auth_token, null);
+            }
+            mAuth.getCurrentUser().linkWithCredential(credential)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                Log.d("success", "linkWithCredential:success");
+                                FirebaseUser user = task.getResult().getUser();
+                                updateUiWithDbData(user);
+                                Toast.makeText(context, "Link account successfully!",
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.w("fail", "linkWithCredential:failure", task.getException());
+                                Toast.makeText(context, "Welcome back!",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+
+                            // ...
+                        }
+                    });
+        }
     }
 }
