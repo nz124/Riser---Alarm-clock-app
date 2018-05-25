@@ -209,7 +209,7 @@ public class AuthUiActivity extends AppCompatActivity {
     }
 
     private void startSignedInActivity(IdpResponse response) {
-        startActivity(SignedInActivity.createIntent(this, response));
+        startActivity(MainActivity.createIntent(this, response));
     }
 
 //    @OnClick({R.id.default_theme, R.id.purple_theme, R.id.green_theme, R.id.dark_theme})

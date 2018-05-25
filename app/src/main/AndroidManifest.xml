@@ -11,7 +11,7 @@
         android:roundIcon="@drawable/alarmclock"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat">
-        <activity android:name=".FragmentPagerSupport"
+        <activity android:name=".MainActivity"
                  android:label="@string/app_name">
             <intent-filter>
                 <data android:scheme="@string/fb_login_protocol_scheme" />
@@ -22,9 +22,8 @@
         </activity>
         <activity android:name=".AuthUiActivity"/>
 
-        <activity android:name=".CancelNotification"/>
-        <activity android:name=".SignedInActivity"/>
+        <activity android:name=".AlarmNotification"/>
         <activity android:name=".SnoozeAlarm" />
-        <receiver android:name=".alarm_receiver"/>
+        <receiver android:name=".AlarmReceiver"/>
     </application>
 </manifest>
