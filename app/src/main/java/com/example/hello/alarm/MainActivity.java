@@ -34,6 +34,8 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 import me.relex.circleindicator.CircleIndicator;
 
 
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     Context context;
     Uri defaultUri;
     Uri mPhotoUri;
+    private FirebaseAuth mAuth;
 
     public static Intent createIntent(Context context, IdpResponse idpResponse) {
         return new Intent().setClass(context, MainActivity.class)
@@ -79,42 +82,40 @@ public class MainActivity extends AppCompatActivity {
         //Access database and reference to the data of the current's user
         database = FirebaseDatabase.getInstance();
 
-        //Get information from current user, if there is one.
-        final FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
+        mAuth = FirebaseAuth.getInstance();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+
+        //Sign user in anonymously
         if (currentUser == null) {
-            mAuth.signInAnonymously();
-            currentUser = mAuth.getCurrentUser();
-        }
-        mAuth.signInAnonymously()
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update user information
-                            currentUser = mAuth.getCurrentUser();
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("Error", "signInAnonymously:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                FirebaseUser user = task.getResult().getUser();
+                                //Write user's profile to database
+                                writeUserData(user);
+                                //Listen for changes from database and update UI
+                                updateUiWithDbData(user);
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Toast.makeText(context, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
                         }
+                    });
+        }
+        else {
+            //Write user's profile to database
+            writeUserData(currentUser);
+            //Listen for changes from database and update UI
+            updateUiWithDbData(currentUser);
+        }
 
-                        // ...
-                    }
-                });
-        Log.e("info", "onCreate: " + currentUser.getDisplayName());
 
-        user_name = (currentUser.getDisplayName().equals("")) ? "Guest" : currentUser.getDisplayName();
-        user_email = (currentUser.getEmail() == null) ? "No Email Provided" : currentUser.getEmail();
-        user_photoUrl = (currentUser.getPhotoUrl() == null) ? defaultUri : currentUser.getPhotoUrl();
-        user_id = currentUser.getUid();
-
-        //Write user's profile to database
-        writeUserData(user_name, user_photoUrl);
-
-        //Listen for changes from database and update UI
-        updateUiWithDbData(user_id);
 
 
         //Determine to increment or decrement point based on the extras being passed in
@@ -149,8 +150,13 @@ public class MainActivity extends AppCompatActivity {
                         menuItem.setChecked(true);
                         // close drawer when item is tapped
                         mDrawerLayout.closeDrawers();
-                        if (menuItem.getItemId() == R.id.nav_sign_out) {
-                            mAuth.signOut();
+                        switch(menuItem.getItemId()) {
+                            case R.id.nav_sign_in:
+                                startActivity(AuthUiActivity.createIntent(context));
+                                break;
+                            case R.id.nav_sign_out:
+                                mAuth.signOut();
+                                Toast.makeText(context, "Sign out succesfully", Toast.LENGTH_LONG).show();
                         }
                         // Add code here to update the UI based on the item selected
                         // For example, swap UI fragments here
@@ -184,7 +190,6 @@ public class MainActivity extends AppCompatActivity {
         menu.findItem(R.id.action_settings).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Log.e("hey", "DUYy");
                 return true;
             }
         });
@@ -210,8 +215,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void updateUiWithDbData(final String user_id) {
+    public void updateUiWithDbData(FirebaseUser user) {
         // Read from the database
+        user_id = user.getUid();
         database.getReference().child(user_id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -263,23 +269,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void writeUserData(String name, Uri imageUrl) {
-        String mPhotoUri;
-        if (imageUrl != null) {
-            mPhotoUri = imageUrl.toString();
-        } else {
-            mPhotoUri = defaultUri.toString();
-        }
+    public void writeUserData(FirebaseUser user) {
+        String mName, mPhotoUriString, user_id;
+        user_id = user.getUid();
+        mName = (user.getDisplayName().equals("")) ? "Guest": user.getDisplayName();
+        mPhotoUri = (user.getPhotoUrl() == null) ? defaultUri: user.getPhotoUrl();
+        mPhotoUriString = mPhotoUri.toString();
         myRef = database.getReference(user_id).child("Name");
-        myRef.setValue(name);
+        myRef.setValue(mName);
         myRef = database.getReference(user_id).child("Photo");
-        myRef.setValue(mPhotoUri);
+        myRef.setValue(mPhotoUriString);
         myRef = database.getReference(user_id).child("Point");
-        //Initilize point for first time user
+        //Initialize point for first time user
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue().toString().equals("")) {
+                if (dataSnapshot.getValue() == null) {
                     myRef.setValue(0);
                 }
             }
