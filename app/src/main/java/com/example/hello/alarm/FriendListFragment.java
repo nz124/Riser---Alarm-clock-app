@@ -64,9 +64,9 @@ public class FriendListFragment extends Fragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            String mFriendName = snapshot.child("Name").getValue().toString();
-                            String mFriendUrlString = snapshot.child("Photo").getValue().toString();
-                            Integer mFriendPoint = (snapshot.child("Point").getValue() == null)? 0 : Integer.valueOf(snapshot.child("Point").getValue().toString());
+                            String mFriendName = snapshot.child("Name").getValue(String.class);
+                            String mFriendUrlString = snapshot.child("Photo").getValue(String.class);
+                            Integer mFriendPoint = (snapshot.child("Point").getValue() == null)? 0 : snapshot.child("Point").getValue(Integer.class);
                             Uri mFriendPhotoUri = Uri.parse(mFriendUrlString);
                             //Add friend to list friend
                             Friend newFriend = new Friend(mFriendPhotoUri, mFriendName, mFriendPoint);
