@@ -94,27 +94,14 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         // Check if user is signed in (non-null) and update UI accordingly.
         currentUser = mAuth.getCurrentUser();
-
-
         //Sign user in anonymously
         if (currentUser == null) {
-            nav_sign_in.setVisible(true);
             loginAsGuest();
-
         }
         else {
-            //Write user's profile to database
-            writeUserData(currentUser);
             //Listen for changes from database and update UI
             updateUI(currentUser);
-            //Display sign in and sign out buttons properly based on authentication status
-            if (currentUser.isAnonymous()){
-                nav_sign_in.setVisible(true);
-                nav_sign_out.setVisible(false);
-            } else {
-                nav_sign_out.setVisible(true);
-                nav_sign_in.setVisible(false);
-            }
+            //Convert guest account to Facebook/Google account if possible
             linkAccount();
         }
 
@@ -159,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
                                 mAuth.signOut();
                                 Toast.makeText(context, "Sign out succesfully", Toast.LENGTH_LONG).show();
                                 loginAsGuest();
-                                writeUserData(currentUser);
                                 updateUI(currentUser);
                         }
                         // Add code here to update the UI based on the item selected
@@ -219,17 +205,22 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void incrementPointAndSaveToDb(FirebaseUser user, final boolean increment, final Integer point) {
+    public void incrementPointAndSaveToDb(FirebaseUser user, final boolean increment, final int point) {
         myRef = database.getReference(user.getUid()).child("Point");
         myRef.runTransaction(new Transaction.Handler() {
             @Override
             public Transaction.Result doTransaction(MutableData currentData) {
-                Log.e("hey", "doTransaction: "+currentData.getValue(Integer.class) );
-                if (increment) {
-                    currentData.setValue(currentData.getValue(Integer.class) + point);
+                Log.e("hey", "doTransaction: "+currentData.getValue(int.class));
+                if (currentData.getValue(int.class) != null) {
+                    if (increment) {
+                        currentData.setValue(currentData.getValue(int.class) + point);
+                    } else {
+                        currentData.setValue(currentData.getValue(int.class) - point);
+                    }
                 } else {
-                    currentData.setValue(currentData.getValue(Integer.class) - point);
+                    currentData.setValue(point);
                 }
+                nav_point.setText("Point: " + currentData.getValue(int.class));
                 return Transaction.success(currentData);
             }
 
@@ -244,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void writeUserData(FirebaseUser user) {
+    public void createFirstTimeUserData(FirebaseUser user) {
         if (user != null) {
             String mName, mPhotoUriString, user_id;
             user_id = user.getUid();
@@ -261,15 +252,13 @@ public class MainActivity extends AppCompatActivity {
             myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Integer point = dataSnapshot.getValue(Integer.class);
-                    if (point == null) {
+                    if (dataSnapshot.getValue(int.class) == null) {
                         myRef.setValue(0);
                         nav_point.setText("Point: 0");
                     } else {
-                        nav_point.setText("Point:" + point.toString());
+                        nav_point.setText("Point:" + dataSnapshot.getValue(int.class));
                     }
                 }
-
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     //...
@@ -287,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             currentUser = task.getResult().getUser();
                             //Write user's profile to database
-                            writeUserData(currentUser);
+                            createFirstTimeUserData(currentUser);
                             //Listen for changes from database and update UI
                             updateUI(currentUser);
                         } else {
@@ -334,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUI(FirebaseUser user){
-        if (nav_sign_in.isVisible()){
+        if (user.isAnonymous()){
             nav_sign_out.setVisible(false);
         } else if (nav_sign_out.isVisible()) {
             nav_sign_in.setVisible(false);
@@ -342,35 +331,27 @@ public class MainActivity extends AppCompatActivity {
 
         if (user.isAnonymous()) {
             nav_name.setText("Guest");
-            nav_photo.setImageURI(defaultUri);
+            //Display sign in and sign out buttons
+            nav_sign_in.setVisible(true);
+            nav_sign_out.setVisible(false);
         } else {
-            // Read from the database
-
-            database.getReference().child(user.getUid()).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    // This method is called once with the initial value and again
-                    // whenever data at this location is updated.
-                    mPhotoUri = Uri.parse(dataSnapshot.child("Photo").getValue(String.class));
-                    current_point = dataSnapshot.child("Point").getValue(Integer.class);
-//                Glide.with(context)
-//                        .load(mPhotoUri)
-//                        .into(nav_photo);
-                    nav_name.setText(dataSnapshot.child("Name").getValue(String.class));
-                    if (current_point != null) {
-                        String point_display = String.valueOf(current_point);
-                        //Update point if there are changes
-                        nav_point.setText("Current point: " + point_display);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    // Failed to read value
-                    Log.w("", "Failed to read value.", error.toException());
-                }
-            });
+            nav_sign_in.setVisible(false);
+            nav_sign_out.setVisible(true);
         }
+        myRef = database.getReference(user.getUid());
+        //Update user information from Database
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot data) {
+                nav_name.setText(data.child("Name").getValue(String.class));
+                nav_point.setText("Point: " + data.child("Point").getValue(int.class));
+                nav_photo.setImageURI(Uri.parse(data.child("Photo").getValue(String.class)));
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //...
+            }
+        });
     }
 
 
