@@ -28,8 +28,8 @@ public class FriendListFragment extends Fragment {
     AccessToken currentUserToken;
     String currentUserId;
     String currentUserTokenString;
-    FirebaseDatabase database;
     DatabaseReference myRef;
+    ValueEventListener eventListener;
 
     public FriendListFragment() {
         // Required empty public constructor
@@ -42,7 +42,9 @@ public class FriendListFragment extends Fragment {
         if (currentUserToken != null){
             currentUserId = currentUserToken.getUserId();
         currentUserTokenString = currentUserToken.getToken();
-    }
+        }
+
+        myRef = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -59,24 +61,23 @@ public class FriendListFragment extends Fragment {
         mFriendListDisplay.setAdapter(friendAdapter);
 
 
-        FirebaseDatabase.getInstance().getReference()
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            User friend = snapshot.getValue(User.class);
-                            String mFriendName = friend.name;
-                            String mFriendUrlString = friend.photoUriString;
-                            Integer mFriendPoint = friend.point;
-                            //Add friend to list friend
-                            Friend newFriend = new Friend(mFriendUrlString, mFriendName, mFriendPoint);
-                            friendAdapter.add(newFriend);
-                        }
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        User friend = snapshot.getValue(User.class);
+                        String mFriendName = friend.name;
+                        String mFriendUrlString = friend.photoUriString;
+                        Integer mFriendPoint = friend.point;
+                        //Add friend to list friend
+                        Friend newFriend = new Friend(mFriendUrlString, mFriendName, mFriendPoint);
+                        friendAdapter.add(newFriend);
                     }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
 
 
 //        LoginManager.getInstance().logInWithReadPermissions(
@@ -163,6 +164,12 @@ public class FriendListFragment extends Fragment {
 
             return convertView;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
     }
 }
 

@@ -44,7 +44,6 @@ public class AlarmListFragment extends Fragment {
     Context context;
     PendingIntent pending_intent;
     ArrayList alarm_data;
-    Integer current_point;
     static FirebaseDatabase database;
     static DatabaseReference myRef;
     String channelId;
@@ -92,24 +91,6 @@ public class AlarmListFragment extends Fragment {
         return view;
     }
 
-    public static class Alarm {
-        String time_string;
-        PendingIntent alarm_pending_intent;
-
-        public Alarm() {
-            super();
-        }
-
-        public Alarm(PendingIntent alarm_pending_intent, int hour, int minute) {
-            super();
-            this.alarm_pending_intent = alarm_pending_intent;
-            String hour_string, minute_string;
-            hour_string = String.valueOf(hour);
-            minute_string = minute < 10 ? "0" + String.valueOf(minute) : String.valueOf(minute);
-            this.time_string = hour_string + " : " + minute_string;
-        }
-
-    }
 
     public class AlarmAdapter extends ArrayAdapter<Alarm> {
 
@@ -135,20 +116,20 @@ public class AlarmListFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     //Remove the alarm from AlarmManager and from ListView
-                    alarmManager.cancel(alarm != null ? alarm.alarm_pending_intent : null);
+                    Log.e("Remove intent", "onClick: "+ PendingIntent.getBroadcast(getContext(), alarm.id, new Intent(getContext(), AlarmReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT) );
+                    alarmManager.cancel(PendingIntent.getBroadcast(getContext(), alarm.id, new Intent(getContext(), AlarmReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT));
                     alarm_data.remove(position);
                     notifyDataSetChanged();
                 }
 
 
             });
-            assert alarm != null;
-            tvTime.setText(alarm.time_string);
+            tvTime.setText(alarm.getTimeDisplay());
             return convertView;
         }
     }
 
-    public static void AddAlarm(Context context, int hour, int minute){
+    public static void AddAlarm(Context context, int hour, int minute, int date, int month){
         //Alarm Id
         int alarm_id = new Random().nextInt();
 
@@ -163,24 +144,27 @@ public class AlarmListFragment extends Fragment {
         //Set calendar's time for the alarm
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.DAY_OF_MONTH, date);
+        calendar.set(Calendar.MONTH, month);
 
 
         final Intent alarm_intent = new Intent(context, AlarmReceiver.class);
         alarm_intent.putExtra("alarm_id", alarm_id);
         PendingIntent pending_intent = PendingIntent.getBroadcast(context, alarm_id, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Log.e("Add intent", "AddAlarm: "+ pending_intent );
         AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_intent);
         alarmManager.setAlarmClock(alarm_info, pending_intent);
 
         //Add alarm to list view
-        Alarm newAlarm = new Alarm(pending_intent, hour, minute);
+        Alarm newAlarm = new Alarm(alarm_id, hour, minute, date, month);
         adapter.add(newAlarm);
 
 
         //Show a persistent notification on notification bar
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Alarm Channel")
                 .setSmallIcon(R.drawable.alarmclock)
-                .setContentTitle(newAlarm.time_string)
-                .setContentText("You have the next alarm at " + newAlarm.time_string)
+                .setContentTitle(newAlarm.getTimeDisplay())
+                .setContentText("You have the next alarm at " + newAlarm.getTimeDisplay())
                 .setPriority(NotificationManagerCompat.IMPORTANCE_LOW)
                 .addAction(R.drawable.alarmclock, "Turn Off", turn_off_intent)
                 .addAction(R.drawable.alarmclock, "Add 10 minutes", snooze_intent);
