@@ -40,6 +40,8 @@ import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
@@ -48,7 +50,7 @@ import me.relex.circleindicator.CircleIndicator;
 
 public class MainActivity extends AppCompatActivity {
     static final int NUM_ITEMS = 2;
-    static FirebaseDatabase database;
+    static DatabaseReference database;
     static DatabaseReference myRef;
     DrawerLayout mDrawerLayout;
     ActionBarDrawerToggle mDrawerToggle;
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         nav_sign_out = navigationView.getMenu().findItem(R.id.nav_sign_out);
 
         //Access database and reference to the data of the current's user
-        database = FirebaseDatabase.getInstance();
+        database = FirebaseDatabase.getInstance().getReference();
 
         mAuth = FirebaseAuth.getInstance();
         // Check if user is signed in (non-null) and update UI accordingly.
@@ -206,34 +208,27 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void incrementPointAndSaveToDb(FirebaseUser user, final boolean increment, final int point) {
-        myRef = database.getReference(user.getUid()).child("point");
-        Log.e("yo bro", "incrementPointAndSaveToDb: "+myRef );
-        //Update user information from Database
+    public void incrementPointAndSaveToDb(final FirebaseUser user, final boolean increment, final int point) {
+
+        myRef = database.child(user.getUid()).child("point");
+        //Get user's current point
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot data) {
-                Log.e("yooo", "onDataChange: "+ data.child("Point").getValue(int.class) );
-                if (data.getValue(int.class) != null){
-                    int currentPoint = data.getValue(int.class);
-                    Log.e("hey", "onDataChange: " + currentPoint );
-                    if (increment){
-                        currentPoint += point;
-                        myRef.setValue(currentPoint);
-                    } else {
-                        currentPoint -= point;
-                        myRef.setValue(currentPoint);
-                    }
+                int updatedPoint = data.getValue(int.class);
+                if (increment){
+                    updatedPoint += point;
                 }
                 else {
-                    if (increment){
-                        myRef.setValue(point);
-                    } else {
-                        myRef.setValue(1);
-                    }
-
+                    updatedPoint -= point;
                 }
+                //Update point from Database
+                Map<String, Object> childUpdate = new HashMap<>();
+                childUpdate.put("/"+ user.getUid() + "/" + "point", updatedPoint);
+                database.updateChildren(childUpdate);
 
+                //Display point
+                nav_point.setText("Point: " + updatedPoint);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -245,13 +240,13 @@ public class MainActivity extends AppCompatActivity {
     public void createFirstTimeUserData(FirebaseUser user) {
         String mName, mPhotoUriString, user_id;
         user_id = user.getUid();
-        myRef = database.getReference(user_id);
+        myRef = database.child(user_id);
 
         mName = (user.getDisplayName() == null) ? "Guest" + new Random().nextInt() : user.getDisplayName();
         mPhotoUri = (user.getPhotoUrl() == null) ? defaultUri : user.getPhotoUrl();
         mPhotoUriString = mPhotoUri.toString();
 
-        User newUser = new User(mName, mPhotoUriString, 0);
+        User newUser = new User(mName, mPhotoUriString, 1);
         myRef.setValue(newUser);
 
     }
@@ -314,7 +309,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateUI(FirebaseUser user){
         if (user.isAnonymous()) {
-            nav_name.setText("Guest");
             //Display sign in and sign out buttons
             nav_sign_in.setVisible(true);
             nav_sign_out.setVisible(false);
@@ -322,17 +316,18 @@ public class MainActivity extends AppCompatActivity {
             nav_sign_in.setVisible(false);
             nav_sign_out.setVisible(true);
         }
-        Log.e("yo", "updateUI: "+"where am I" );
-        myRef = database.getReference(user.getUid());
+
+        myRef = database.child(user.getUid());
         //Update user information from Database
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot data) {
-                nav_name.setText(data.child("Name").getValue(String.class));
-                nav_point.setText("Point: " + data.child("Point").getValue(int.class));
-                String uriString = data.child("Photo").getValue(String.class);
+                User user = data.getValue(User.class);
+                Log.e("tell me this", "onDataChange: "+user.photoUriString );
+                nav_name.setText(user.name);
+                nav_point.setText("Point: " + user.point);
                 Glide.with(context)
-                        .load(uriString)
+                        .load(user.photoUriString)
                         .into(nav_photo);
             }
             @Override
