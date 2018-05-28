@@ -116,7 +116,6 @@ public class AlarmListFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     //Remove the alarm from AlarmManager and from ListView
-                    Log.e("Remove intent", "onClick: "+ PendingIntent.getBroadcast(getContext(), alarm.id, new Intent(getContext(), AlarmReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT) );
                     alarmManager.cancel(PendingIntent.getBroadcast(getContext(), alarm.id, new Intent(getContext(), AlarmReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT));
                     alarm_data.remove(position);
                     notifyDataSetChanged();
@@ -151,7 +150,6 @@ public class AlarmListFragment extends Fragment {
         final Intent alarm_intent = new Intent(context, AlarmReceiver.class);
         alarm_intent.putExtra("alarm_id", alarm_id);
         PendingIntent pending_intent = PendingIntent.getBroadcast(context, alarm_id, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Log.e("Add intent", "AddAlarm: "+ pending_intent );
         AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_intent);
         alarmManager.setAlarmClock(alarm_info, pending_intent);
 
