@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.util.ExtraConstants;
 import com.google.android.gms.auth.api.Auth;
@@ -345,7 +346,10 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot data) {
                 nav_name.setText(data.child("Name").getValue(String.class));
                 nav_point.setText("Point: " + data.child("Point").getValue(int.class));
-                nav_photo.setImageURI(Uri.parse(data.child("Photo").getValue(String.class)));
+                String uriString = data.child("Photo").getValue(String.class);
+                Glide.with(context)
+                        .load(uriString)
+                        .into(nav_photo);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
