@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Alarm {
-    public boolean monday, tuesday, wednesday, thursday, friday, saturday, sunday, allday;
     public int id, hour, minute, date, month;
 
     public Alarm(){

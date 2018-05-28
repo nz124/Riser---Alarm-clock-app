@@ -27,6 +27,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -44,8 +46,7 @@ public class AlarmListFragment extends Fragment {
     Context context;
     PendingIntent pending_intent;
     ArrayList alarm_data;
-    static FirebaseDatabase database;
-    static DatabaseReference myRef;
+
     String channelId;
     static Calendar calendar;
     static Intent snoozeIntent;
@@ -53,6 +54,10 @@ public class AlarmListFragment extends Fragment {
     static PendingIntent turn_off_intent;
     static PendingIntent snooze_intent;
     static AlarmAdapter adapter;
+
+    static DatabaseReference myRef;
+    FirebaseUser currentUser;
+
 
 
 
@@ -63,6 +68,10 @@ public class AlarmListFragment extends Fragment {
         //Create array of all alarm to show on the list view
         alarm_data = new ArrayList<>();
         adapter = new AlarmAdapter(getContext(), R.layout.alarm_list_item, alarm_data);
+
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Alarms");
+
     }
 
 
@@ -156,6 +165,10 @@ public class AlarmListFragment extends Fragment {
         //Add alarm to list view
         Alarm newAlarm = new Alarm(alarm_id, hour, minute, date, month);
         adapter.add(newAlarm);
+
+        //Add alarm to user's database
+        myRef.push().setValue(newAlarm.toMapAlarm());
+
 
 
         //Show a persistent notification on notification bar
