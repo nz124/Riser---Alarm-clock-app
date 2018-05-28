@@ -219,17 +219,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot data) {
                 int updatedPoint = data.getValue(int.class);
-                if (increment && updatedPoint != 0){
+                if (increment){
                     updatedPoint += point;
                 }
-                else if (!increment && updatedPoint != 0){
+                else if (updatedPoint != 0){
                     updatedPoint -= point;
                 }
                 //Update point from Database
                 Map<String, Object> childUpdate = new HashMap<>();
                 childUpdate.put("/"+ user.getUid() + "/" + "point", updatedPoint);
                 database.updateChildren(childUpdate);
-
+                Log.e("why", "onDataChange: "+ updatedPoint );
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {

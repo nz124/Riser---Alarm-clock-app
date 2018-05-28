@@ -29,8 +29,12 @@ import android.widget.TimePicker;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,6 +75,34 @@ public class AlarmListFragment extends Fragment {
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Alarms");
+
+        myRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                //Add alarm to list view
+                Alarm newAlarm = dataSnapshot.getValue(Alarm.class);
+                adapter.add(newAlarm);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -124,10 +156,16 @@ public class AlarmListFragment extends Fragment {
             removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Remove the alarm from AlarmManager and from ListView
-                    alarmManager.cancel(PendingIntent.getBroadcast(getContext(), alarm.id, new Intent(getContext(), AlarmReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT));
-                    alarm_data.remove(position);
+                    //Remove the alarm from AlarmManager
+                    if (alarmManager != null) {
+                        alarmManager.cancel(PendingIntent.getBroadcast(getContext(), alarm.id, new Intent(getContext(), AlarmReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT));
+                    }
+
+                    //Remove the alarm from the database
+                    myRef.child(String.valueOf(alarm.id)).removeValue();
+                    alarm_data.remove(alarm);
                     notifyDataSetChanged();
+
                 }
 
 
@@ -153,7 +191,7 @@ public class AlarmListFragment extends Fragment {
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.DAY_OF_MONTH, date);
-        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.MONTH, month - 1);
 
 
         final Intent alarm_intent = new Intent(context, AlarmReceiver.class);
@@ -162,13 +200,10 @@ public class AlarmListFragment extends Fragment {
         AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_intent);
         alarmManager.setAlarmClock(alarm_info, pending_intent);
 
-        //Add alarm to list view
-        Alarm newAlarm = new Alarm(alarm_id, hour, minute, date, month);
-        adapter.add(newAlarm);
 
         //Add alarm to user's database
-        myRef.push().setValue(newAlarm.toMapAlarm());
-
+        Alarm newAlarm = new Alarm(alarm_id, hour, minute, date, month);
+        myRef.child(String.valueOf(alarm_id)).setValue(newAlarm.toMapAlarm());
 
 
         //Show a persistent notification on notification bar

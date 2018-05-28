@@ -18,4 +18,11 @@ public class User {
         this.point = point;
     }
 
+    public List<Alarm> getAlarms() {
+        return alarms;
+    }
+
+    public void addAlarm(Alarm alarm){
+        this.alarms.add(alarm);
+    }
 }
