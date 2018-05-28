@@ -52,11 +52,14 @@ public class MainActivity extends AppCompatActivity {
     static final int NUM_ITEMS = 2;
     static DatabaseReference database;
     static DatabaseReference myRef;
+    ValueEventListener eventListener;
+
     DrawerLayout mDrawerLayout;
     ActionBarDrawerToggle mDrawerToggle;
     Integer current_point;
     NavigationView navigationView;
     FirebaseUser currentUser;
+
     //Select information in the nav's header
     View header_view;
     TextView nav_point;
@@ -306,6 +309,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUI(FirebaseUser user){
+        Log.e("updateui", "updateUI: "+"im' called" );
         if (user.isAnonymous()) {
             //Display sign in and sign out buttons
             nav_sign_in.setVisible(true);
@@ -317,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
 
         myRef = database.child(user.getUid());
         //Update user information from Database
-        myRef.addValueEventListener(new ValueEventListener() {
+        eventListener = myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot data) {
                 User user = data.getValue(User.class);
@@ -333,6 +337,12 @@ public class MainActivity extends AppCompatActivity {
                 //...
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        database.child(currentUser.getUid()).removeEventListener(eventListener);
     }
 
 
