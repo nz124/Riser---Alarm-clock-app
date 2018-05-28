@@ -227,8 +227,6 @@ public class MainActivity extends AppCompatActivity {
                 childUpdate.put("/"+ user.getUid() + "/" + "point", updatedPoint);
                 database.updateChildren(childUpdate);
 
-                //Display point
-                nav_point.setText("Point: " + updatedPoint);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -319,14 +317,15 @@ public class MainActivity extends AppCompatActivity {
 
         myRef = database.child(user.getUid());
         //Update user information from Database
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot data) {
                 User user = data.getValue(User.class);
                 Log.e("tell me this", "onDataChange: "+user.photoUriString );
                 nav_name.setText(user.name);
                 nav_point.setText("Point: " + user.point);
-                Glide.with(context)
+                Log.e("yo", "onDataChange: "+ user.point );
+                Glide.with(getApplicationContext())
                         .load(user.photoUriString)
                         .into(nav_photo);
             }
