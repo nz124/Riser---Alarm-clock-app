@@ -49,7 +49,7 @@ public class AlarmListFragment extends Fragment {
     static AlarmManager alarmManager;
     TimePicker timePicker;
     Context context;
-    PendingIntent pending_intent;
+    ChildEventListener childEventListener;
     ArrayList alarm_data;
 
     String channelId;
@@ -77,13 +77,12 @@ public class AlarmListFragment extends Fragment {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Alarms");
 
-        myRef.addChildEventListener(new ChildEventListener() {
+        childEventListener = myRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 //Add alarm to list view
                 Alarm newAlarm = dataSnapshot.getValue(Alarm.class);
                 adapter.add(newAlarm);
-                Log.e("hey", "onChildAdded: "+s + "/" + dataSnapshot.getValue(Alarm.class).getTimeInMillis() );
             }
 
             @Override
@@ -178,10 +177,9 @@ public class AlarmListFragment extends Fragment {
         }
     }
 
-    public static void AddAlarm(final Context context, int hour, int minute, int date, int month, int year){
-        final boolean[] alarmExisted = {false};
+    public static void AddAlarm(final Context context, final int hour, final int minute, final int date, final int month, final int year){
         //Alarm Id
-        int alarm_id = new Random().nextInt();
+        final int alarm_id = new Random().nextInt();
 
         alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         calendar = Calendar.getInstance();
@@ -194,19 +192,48 @@ public class AlarmListFragment extends Fragment {
         //Set calendar's time for the alarm
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.DAY_OF_MONTH, date);
         calendar.set(Calendar.MONTH, month - 1);
+        calendar.set(Calendar.YEAR, year);
 
 
         //Check if alarm existed
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean alarmExists = false;
                 for (DataSnapshot data: dataSnapshot.getChildren()){
                     if (Math.abs(calendar.getTimeInMillis() - data.getValue(Alarm.class).getTimeInMillis()) < 60000){
                         Toast.makeText(context, "You've already had another alarm scheduled within 1 minute", Toast.LENGTH_LONG).show();
-                        alarmExisted[0] = true;
+                        alarmExists = true;
                     }
+                }
+                if (!alarmExists){
+                    final Intent alarm_intent = new Intent(context, AlarmReceiver.class);
+                    alarm_intent.putExtra("alarm_id", alarm_id);
+                    PendingIntent pending_intent = PendingIntent.getBroadcast(context, alarm_id, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_intent);
+                    alarmManager.setAlarmClock(alarm_info, pending_intent);
+
+
+                    //Add alarm to user's database
+                    Alarm newAlarm = new Alarm(alarm_id, hour, minute, date, month - 1, year);
+                    myRef.child(String.valueOf(alarm_id)).setValue(newAlarm.toMapAlarm());
+
+
+                    //Show a persistent notification on notification bar
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Alarm Channel")
+                            .setSmallIcon(R.drawable.alarmclock)
+                            .setContentTitle(newAlarm.getTimeDisplay())
+                            .setContentText("You have the next alarm at " + newAlarm.getTimeDisplay())
+                            .setPriority(NotificationManagerCompat.IMPORTANCE_LOW)
+                            .addAction(R.drawable.alarmclock, "Turn Off", turn_off_intent)
+                            .addAction(R.drawable.alarmclock, "Add 10 minutes", snooze_intent);
+                    Notification mNotification = builder.build();
+                    mNotification.flags = Notification.FLAG_NO_CLEAR;
+                    NotificationManagerCompat notification= NotificationManagerCompat.from(context);
+                    notification.notify(alarm_id, mNotification);
                 }
             }
 
@@ -215,33 +242,12 @@ public class AlarmListFragment extends Fragment {
 
             }
         });
+    }
 
-        if (!alarmExisted[0]){
-            final Intent alarm_intent = new Intent(context, AlarmReceiver.class);
-            alarm_intent.putExtra("alarm_id", alarm_id);
-            PendingIntent pending_intent = PendingIntent.getBroadcast(context, alarm_id, alarm_intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager.AlarmClockInfo alarm_info = new AlarmManager.AlarmClockInfo(calendar.getTimeInMillis(), pending_intent);
-            alarmManager.setAlarmClock(alarm_info, pending_intent);
-
-
-            //Add alarm to user's database
-            Alarm newAlarm = new Alarm(alarm_id, hour, minute, date, month, year);
-            myRef.child(String.valueOf(alarm_id)).setValue(newAlarm.toMapAlarm());
-
-
-            //Show a persistent notification on notification bar
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Alarm Channel")
-                    .setSmallIcon(R.drawable.alarmclock)
-                    .setContentTitle(newAlarm.getTimeDisplay())
-                    .setContentText("You have the next alarm at " + newAlarm.getTimeDisplay())
-                    .setPriority(NotificationManagerCompat.IMPORTANCE_LOW)
-                    .addAction(R.drawable.alarmclock, "Turn Off", turn_off_intent)
-                    .addAction(R.drawable.alarmclock, "Add 10 minutes", snooze_intent);
-            Notification mNotification = builder.build();
-            mNotification.flags = Notification.FLAG_NO_CLEAR;
-            NotificationManagerCompat notification= NotificationManagerCompat.from(context);
-            notification.notify(alarm_id, mNotification);
-        }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        myRef.removeEventListener(childEventListener);
     }
 }
 
