@@ -59,14 +59,15 @@ public class FriendListFragment extends Fragment {
         mFriendListDisplay.setAdapter(friendAdapter);
 
 
-        FirebaseDatabase.getInstance().getReference().child("")
+        FirebaseDatabase.getInstance().getReference()
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            String mFriendName = snapshot.child("Name").getValue(String.class);
-                            String mFriendUrlString = snapshot.child("Photo").getValue(String.class);
-                            Integer mFriendPoint = (snapshot.child("Point").getValue() == null)? 0 : snapshot.child("Point").getValue(int.class);
+                            User friend = snapshot.getValue(User.class);
+                            String mFriendName = friend.name;
+                            String mFriendUrlString = friend.photoUriString;
+                            Integer mFriendPoint = friend.point;
                             //Add friend to list friend
                             Friend newFriend = new Friend(mFriendUrlString, mFriendName, mFriendPoint);
                             friendAdapter.add(newFriend);

@@ -216,10 +216,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot data) {
                 int updatedPoint = data.getValue(int.class);
-                if (increment){
+                if (increment && updatedPoint != 0){
                     updatedPoint += point;
                 }
-                else {
+                else if (!increment && updatedPoint != 0){
                     updatedPoint -= point;
                 }
                 //Update point from Database
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
         mPhotoUri = (user.getPhotoUrl() == null) ? defaultUri : user.getPhotoUrl();
         mPhotoUriString = mPhotoUri.toString();
 
-        User newUser = new User(mName, mPhotoUriString, 1);
+        User newUser = new User(mName, mPhotoUriString, 0);
         myRef.setValue(newUser);
 
     }
@@ -321,7 +321,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot data) {
                 User user = data.getValue(User.class);
-                Log.e("tell me this", "onDataChange: "+user.photoUriString );
                 nav_name.setText(user.name);
                 nav_point.setText("Point: " + user.point);
                 Log.e("yo", "onDataChange: "+ user.point );
