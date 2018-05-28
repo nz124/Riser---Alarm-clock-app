@@ -19,6 +19,7 @@ public class TimePickerDialogFragment extends DialogFragment implements android.
     AlarmManager alarmManager;
     int date;
     int month;
+    int year;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -31,6 +32,7 @@ public class TimePickerDialogFragment extends DialogFragment implements android.
         int minute = c.get(Calendar.MINUTE);
         date = c.get(Calendar.DAY_OF_MONTH);
         month = c.get(Calendar.MONTH) + 1;
+        year = c.get(Calendar.YEAR);
         // Create a new instance of TimePickerDialog and return it
         return new android.app.TimePickerDialog(getActivity(), this, hour, minute,
                 DateFormat.is24HourFormat(getActivity()));
@@ -40,7 +42,7 @@ public class TimePickerDialogFragment extends DialogFragment implements android.
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // Do something with the time chosen by the user
         Log.e("Hello", "onTimeSet: "+ hourOfDay + minute);
-        AlarmListFragment.AddAlarm(getContext(), hourOfDay, minute, date, month);
+        AlarmListFragment.AddAlarm(getContext(), hourOfDay, minute, date, month, year);
 
     }
 }
