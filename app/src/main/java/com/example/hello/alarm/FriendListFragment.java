@@ -66,10 +66,9 @@ public class FriendListFragment extends Fragment {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             String mFriendName = snapshot.child("Name").getValue(String.class);
                             String mFriendUrlString = snapshot.child("Photo").getValue(String.class);
-                            Integer mFriendPoint = (snapshot.child("Point").getValue() == null)? 0 : snapshot.child("Point").getValue(Integer.class);
-                            Uri mFriendPhotoUri = Uri.parse(mFriendUrlString);
+                            Integer mFriendPoint = (snapshot.child("Point").getValue() == null)? 0 : snapshot.child("Point").getValue(int.class);
                             //Add friend to list friend
-                            Friend newFriend = new Friend(mFriendPhotoUri, mFriendName, mFriendPoint);
+                            Friend newFriend = new Friend(mFriendUrlString, mFriendName, mFriendPoint);
                             friendAdapter.add(newFriend);
                         }
                     }
@@ -120,13 +119,13 @@ public class FriendListFragment extends Fragment {
 
 
     public class Friend {
-        Uri mFriendImageUri;
+        String mFriendImageUri;
         String mFriendName;
         Integer mFriendPoint;
 
         public Friend(){super();}
 
-        public Friend(Uri mFriendImageUri, String mFriendName, Integer mFriendPoint){
+        public Friend(String mFriendImageUri, String mFriendName, Integer mFriendPoint){
             this.mFriendImageUri = mFriendImageUri;
             this.mFriendName = mFriendName;
             this.mFriendPoint = mFriendPoint;

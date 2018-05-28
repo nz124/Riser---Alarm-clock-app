@@ -41,6 +41,7 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
+import java.util.Random;
 
 import me.relex.circleindicator.CircleIndicator;
 
@@ -95,18 +96,6 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         // Check if user is signed in (non-null) and update UI accordingly.
         currentUser = mAuth.getCurrentUser();
-        //Sign user in anonymously
-        if (currentUser == null) {
-            loginAsGuest();
-        }
-        else {
-            //Listen for changes from database and update UI
-            updateUI(currentUser);
-            //Convert guest account to Facebook/Google account if possible
-            linkAccount();
-        }
-
-
 
         //Determine to increment or decrement point based on the extras being passed in
         String action_type = getIntent().getStringExtra("type");
@@ -121,6 +110,17 @@ public class MainActivity extends AppCompatActivity {
             }
             Toast.makeText(this, notification,
                     Toast.LENGTH_LONG).show();
+        }
+
+        //Sign user in anonymously
+        if (currentUser == null) {
+            loginAsGuest();
+        }
+        else {
+            //Listen for changes from database and update UI
+            updateUI(currentUser);
+            //Convert guest account to Facebook/Google account if possible
+            linkAccount();
         }
 
 
@@ -207,66 +207,55 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void incrementPointAndSaveToDb(FirebaseUser user, final boolean increment, final int point) {
-        myRef = database.getReference(user.getUid()).child("Point");
-        myRef.runTransaction(new Transaction.Handler() {
+        myRef = database.getReference(user.getUid()).child("point");
+        Log.e("yo bro", "incrementPointAndSaveToDb: "+myRef );
+        //Update user information from Database
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public Transaction.Result doTransaction(MutableData currentData) {
-                Log.e("hey", "doTransaction: "+currentData.getValue(int.class));
-                if (currentData.getValue(int.class) != null) {
-                    if (increment) {
-                        currentData.setValue(currentData.getValue(int.class) + point);
+            public void onDataChange(DataSnapshot data) {
+                Log.e("yooo", "onDataChange: "+ data.child("Point").getValue(int.class) );
+                if (data.getValue(int.class) != null){
+                    int currentPoint = data.getValue(int.class);
+                    Log.e("hey", "onDataChange: " + currentPoint );
+                    if (increment){
+                        currentPoint += point;
+                        myRef.setValue(currentPoint);
                     } else {
-                        currentData.setValue(currentData.getValue(int.class) - point);
+                        currentPoint -= point;
+                        myRef.setValue(currentPoint);
                     }
-                } else {
-                    currentData.setValue(point);
                 }
-                nav_point.setText("Point: " + currentData.getValue(int.class));
-                return Transaction.success(currentData);
-            }
+                else {
+                    if (increment){
+                        myRef.setValue(point);
+                    } else {
+                        myRef.setValue(1);
+                    }
 
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                if (databaseError != null) {
-                    Log.d("Fail:", "Firebase counter increment failed." + databaseError);
-                } else {
-                    Log.d("Success", "Increment successfully");
                 }
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //...
             }
         });
     }
 
     public void createFirstTimeUserData(FirebaseUser user) {
-        if (user != null) {
-            String mName, mPhotoUriString, user_id;
-            user_id = user.getUid();
+        String mName, mPhotoUriString, user_id;
+        user_id = user.getUid();
+        myRef = database.getReference(user_id);
 
-            mName = (user.getDisplayName() == "") ? "Guest" : user.getDisplayName();
-            mPhotoUri = (user.getPhotoUrl() == null) ? defaultUri : user.getPhotoUrl();
-            mPhotoUriString = mPhotoUri.toString();
-            myRef = database.getReference(user_id).child("Name");
-            myRef.setValue(mName);
-            myRef = database.getReference(user_id).child("Photo");
-            myRef.setValue(mPhotoUriString);
-            myRef = database.getReference(user_id).child("Point");
-            //Initialize point for first time user
-            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.getValue(int.class) == null) {
-                        myRef.setValue(0);
-                        nav_point.setText("Point: 0");
-                    } else {
-                        nav_point.setText("Point:" + dataSnapshot.getValue(int.class));
-                    }
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    //...
-                }
-            });
-        }
+        mName = (user.getDisplayName() == null) ? "Guest" + new Random().nextInt() : user.getDisplayName();
+        mPhotoUri = (user.getPhotoUrl() == null) ? defaultUri : user.getPhotoUrl();
+        mPhotoUriString = mPhotoUri.toString();
+
+        User newUser = new User(mName, mPhotoUriString, 0);
+        myRef.setValue(newUser);
+
     }
+
 
     public void loginAsGuest(){
         mAuth.signInAnonymously()
@@ -324,12 +313,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUI(FirebaseUser user){
-        if (user.isAnonymous()){
-            nav_sign_out.setVisible(false);
-        } else if (nav_sign_out.isVisible()) {
-            nav_sign_in.setVisible(false);
-        }
-
         if (user.isAnonymous()) {
             nav_name.setText("Guest");
             //Display sign in and sign out buttons
@@ -339,6 +322,7 @@ public class MainActivity extends AppCompatActivity {
             nav_sign_in.setVisible(false);
             nav_sign_out.setVisible(true);
         }
+        Log.e("yo", "updateUI: "+"where am I" );
         myRef = database.getReference(user.getUid());
         //Update user information from Database
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
