@@ -7,6 +7,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -77,6 +78,7 @@ public class StoreFragment extends Fragment {
             public TextView itemTitle;
             public TextView itemPrice;
             public TextView itemDescription;
+            public Button itemPurchaseButton;
 
             public ViewHolder(LinearLayout parentView) {
                 super(parentView);
@@ -84,6 +86,7 @@ public class StoreFragment extends Fragment {
                 this.itemTitle = parentView.findViewById(R.id.itemTitle);
                 this.itemPrice = parentView.findViewById(R.id.itemPrice);
                 this.itemDescription = parentView.findViewById(R.id.itemDescription);
+                this.itemPurchaseButton = parentView.findViewById(R.id.purchaseButton);
             }
         }
 
