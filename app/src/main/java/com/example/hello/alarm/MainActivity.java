@@ -1,5 +1,6 @@
 package com.example.hello.alarm;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -337,6 +338,12 @@ public class MainActivity extends AppCompatActivity {
                 //...
             }
         });
+    }
+
+    public static void clearNotification(Context context, int alarm_id){
+        //Clear the notification on notification bar
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(alarm_id);
     }
 
     @Override

@@ -18,6 +18,9 @@ public class AlarmReceiver extends BroadcastReceiver {
         cancelIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         snoozeIntent = new Intent(context, SnoozeAlarm.class);
         context.startActivity(cancelIntent);
+        //Retrieve alarm's id and cancel reminding notification on status bar
+        final int alarm_id = intent.getIntExtra("alarm_id", 0);
+        MainActivity.clearNotification(context, alarm_id);
     }
 }
 

@@ -163,6 +163,9 @@ public class AlarmListFragment extends Fragment {
                         alarmManager.cancel(PendingIntent.getBroadcast(getContext(), alarm.id, new Intent(getContext(), AlarmReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT));
                     }
 
+                    //Clear reminding notification on the status bar
+                    MainActivity.clearNotification(getContext(), alarm.id);
+
                     //Remove the alarm from the database
                     myRef.child(String.valueOf(alarm.id)).removeValue();
                     alarm_data.remove(alarm);

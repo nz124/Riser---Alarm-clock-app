@@ -41,20 +41,22 @@ public class AlarmNotification extends Activity {
         time_display.setText(currentTimeString);
         date_display.setText(currentDateString);
 
-        //Clear the notification on notification bar
-        NotificationManager notificationManager = (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
 
         final MediaPlayer mp = MediaPlayer.create(this, R.raw.apple_ring);
         final Vibrator vib = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        final NotificationManager notificationManager = (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
+
         vib.vibrate(500);
         mp.setLooping(true);
         mp.start();
+
         final Intent main_activity_intent = new Intent(this, MainActivity.class);
 
         Button turn_off_button = findViewById(R.id.turn_off);
         turn_off_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Stop sound
                 mp.stop();
                 vib.cancel();
                 main_activity_intent.putExtra("type", "turn_off");
