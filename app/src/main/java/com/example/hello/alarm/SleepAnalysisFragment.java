@@ -19,6 +19,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.utils.Utils;
@@ -30,13 +31,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,7 +42,6 @@ public class SleepAnalysisFragment extends Fragment {
     LineData lineData;
     FirebaseUser currentUser;
     DatabaseReference myRef;
-    List<BarEntry> entries;
 
     Date currentTime;
     String firstDayOfWeek;
@@ -79,7 +76,6 @@ public class SleepAnalysisFragment extends Fragment {
         myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Sleep Data");
 
         Utils.init(getContext());
-        entries = new ArrayList<>();
     }
 
     @Override
@@ -102,6 +98,13 @@ public class SleepAnalysisFragment extends Fragment {
             }
         });
         showMonthChartRadioButton = rootView.findViewById(R.id.month_button);
+        showMonthChartRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parentLayout.removeAllViews();
+                showMonthChart(rootView);
+            }
+        });
         showAllTimeChartRadioButton = rootView.findViewById(R.id.all_time_button);
 
         // l.setExtra(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
@@ -146,11 +149,11 @@ public class SleepAnalysisFragment extends Fragment {
         myRef.child(currentYear).child(currentMonth).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                List<BarEntry> weekData = new ArrayList<>();
                 int date;
                 float hour;
                 float minute;
                 float hourAndMinuteValue;
-                String dayOfWeek = null;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     //Get only the dates within the current week
                     date = Integer.valueOf(data.getKey()) - Integer.valueOf(firstDayOfWeek);
@@ -158,9 +161,8 @@ public class SleepAnalysisFragment extends Fragment {
                         minute = data.getValue(long.class) / (1000 * 60) % 60;
                         hour = data.getValue(long.class) / (1000 * 60 * 60) % 24;
                         hourAndMinuteValue = hour + minute / 60 * 100;
-                        Log.e("fuck", "onDataChange: " + hour + "?" + minute );
                         //Add data point
-                        entries.add(new BarEntry(date, hourAndMinuteValue));
+                        weekData.add(new BarEntry(date, hourAndMinuteValue));
                     }
                 }
 
@@ -222,7 +224,7 @@ public class SleepAnalysisFragment extends Fragment {
                 l.setTextSize(11f);
                 l.setXEntrySpace(4f);
 
-                BarDataSet dataSet = new BarDataSet(entries, "Sleeping Time");
+                BarDataSet dataSet = new BarDataSet(weekData, "Sleeping Time");
                 BarData data = new BarData(dataSet);
                 chart.setData(data);
                 chart.invalidate();
@@ -232,108 +234,99 @@ public class SleepAnalysisFragment extends Fragment {
             }
         });
     }
-//
-//    public void showMonthChart(final View rootView) {
-//        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                String date;
-//                int hour;
-//                int minute;
-//                int hourAndMinuteValue;
-//                DateFormat dateString;
-//                Date fullDate;
-//                String dayOfWeek = null;
-//                for (DataSnapshot data : dataSnapshot.getChildren()) {
-//                    date = data.getKey();
-//                    try {
-//                        dateString =new SimpleDateFormat("EEE");
-//                        fullDate = new SimpleDateFormat("dd-M-yyyy").parse(date);
-//                        dayOfWeek = dateString.format(fullDate);
-//                    } catch (ParseException e) {
-//                        e.printStackTrace();
-//                    }
-//                    minute = Math.round(data.getValue(long.class) / (1000 * 60) % 60);
-//                    hour = Math.round(data.getValue(long.class) / (1000 * 60 * 60) % 24);
-//                    hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
-//
-//                    entries.add(new BarEntry(dayOfWeek[date], hourAndMinuteValue));
-//                    Log.e("Hour and Minute", "onDataChange: " + dayOfWeek + dayOfWeekToNumber.get(dayOfWeek)+ hourAndMinuteValue);
-//                }
-//
-//                // programmatically create a LineChart and set size
-//                BarChart chart = new BarChart(getContext());
-//                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-//                        RelativeLayout.LayoutParams.MATCH_PARENT,
-//                        1000
-//                );
-//
-//                params.setMargins(0, 300, 0, 0);
-//
-//                chart.setLayoutParams(params);
-//
-//                // get parent layout in xml
-//                RelativeLayout rl = rootView.findViewById(R.id.root);
-//                rl.addView(chart); // add the programmatically created chart
-//
-//                chart.setDrawBarShadow(false);
-//                chart.setDrawValueAboveBar(true);
-//
-//                chart.getDescription().setEnabled(false);
-//
-//                // if more than 60 entries are displayed in the chart, no values will be
-//                // drawn
-//                chart.setMaxVisibleValueCount(8);
-//
-//                // scaling can now only be done on x- and y-axis separately
-//                chart.setPinchZoom(false);
-//
-//                chart.setDrawGridBackground(false);
-//                // mChart.setDrawYLabels(false);
-//
-//                IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(chart);
-//
-//                XAxis xAxis = chart.getXAxis();
-//                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-//                xAxis.setDrawGridLines(false);
-//                xAxis.setGranularity(1f); // only intervals of 1 day
-//                xAxis.setLabelCount(7);
-//                xAxis.setValueFormatter(xAxisFormatter);
-//
-//                IAxisValueFormatter custom = new YAxisValueFormatter();
-//
-//                YAxis leftAxis = chart.getAxisLeft();
-//                leftAxis.setLabelCount(8, false);
-//                leftAxis.setValueFormatter(custom);
-//                leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-//                leftAxis.setSpaceTop(15f);
-//                leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-//
-//                YAxis rightAxis = chart.getAxisRight();
-//                rightAxis.setDrawGridLines(false);
-//                rightAxis.setLabelCount(8, false);
-//                rightAxis.setValueFormatter(custom);
-//                rightAxis.setSpaceTop(15f);
-//                rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-//
-//                Legend l = chart.getLegend();
-//                l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-//                l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
-//                l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-//                l.setDrawInside(false);
-//                l.setForm(Legend.LegendForm.SQUARE);
-//                l.setFormSize(9f);
-//                l.setTextSize(11f);
-//                l.setXEntrySpace(4f);
-//
-//                BarDataSet dataSet = new BarDataSet(entries, "Sleeping Time");
-//                BarData data = new BarData(dataSet);
-//                chart.setData(data);
-//                chart.invalidate();
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//            }
-//        });
-//    }
+
+    public void showMonthChart(final View rootView) {
+        myRef.child(currentYear).child(currentMonth).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                float hour;
+                float minute;
+                float hourAndMinuteValue;
+                List<BarEntry> monthData = new ArrayList<>();
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+
+                    minute = Math.round(data.getValue(long.class) / (1000 * 60) % 60);
+                    hour = Math.round(data.getValue(long.class) / (1000 * 60 * 60) % 24);
+                    hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
+
+                    monthData.add(new BarEntry(Integer.valueOf(data.getKey()), hourAndMinuteValue));
+                    Log.e("ANSWER ME", "onDataChange: "+Integer.valueOf(data.getKey()));
+                }
+
+                // programmatically create a LineChart and set size
+                BarChart chart = new BarChart(getContext());
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.MATCH_PARENT,
+                        1000
+                );
+
+                params.setMargins(0, 300, 0, 0);
+
+                chart.setLayoutParams(params);
+
+                // get parent layout in xml
+                RelativeLayout rl = rootView.findViewById(R.id.root);
+                rl.addView(chart); // add the programmatically created chart
+
+                chart.setDrawBarShadow(false);
+                chart.setDrawValueAboveBar(true);
+
+                chart.getDescription().setEnabled(false);
+
+                // if more than 60 entries are displayed in the chart, no values will be
+                // drawn
+                chart.setMaxVisibleValueCount(30);
+
+                // scaling can now only be done on x- and y-axis separately
+                chart.setPinchZoom(false);
+
+                chart.setDrawGridBackground(false);
+                // mChart.setDrawYLabels(false);
+
+                IAxisValueFormatter xAxisFormatter = new DateAxisValueFormatter(chart);
+
+                XAxis xAxis = chart.getXAxis();
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setDrawGridLines(false);
+                xAxis.setGranularity(1f); // only intervals of 1 day
+                xAxis.setLabelCount(10);
+                xAxis.setCenterAxisLabels(true);
+                xAxis.setValueFormatter(xAxisFormatter);
+
+                IAxisValueFormatter custom = new YAxisValueFormatter();
+
+                YAxis leftAxis = chart.getAxisLeft();
+                leftAxis.setLabelCount(8, false);
+                leftAxis.setValueFormatter(custom);
+                leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+                leftAxis.setSpaceTop(15f);
+                leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+                YAxis rightAxis = chart.getAxisRight();
+                rightAxis.setDrawGridLines(false);
+                rightAxis.setLabelCount(8, false);
+                rightAxis.setValueFormatter(custom);
+                rightAxis.setSpaceTop(15f);
+                rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+                Legend l = chart.getLegend();
+                l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+                l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+                l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+                l.setDrawInside(false);
+                l.setForm(Legend.LegendForm.SQUARE);
+                l.setFormSize(9f);
+                l.setTextSize(11f);
+                l.setXEntrySpace(4f);
+
+                BarDataSet dataSet = new BarDataSet(monthData, "Sleeping Time");
+                BarData data = new BarData(dataSet);
+                chart.setData(data);
+                chart.invalidate();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
 }

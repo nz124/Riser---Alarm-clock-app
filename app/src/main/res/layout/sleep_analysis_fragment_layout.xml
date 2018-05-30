@@ -27,26 +27,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Weekly" />
+            android:text="Week" />
 
         <RadioButton
             android:id="@+id/month_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Monthly" />
+            android:text="Month" />
 
         <RadioButton
-            android:id="@+id/all_time_button"
+            android:id="@+id/year_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="All" />
+            android:text="Year" />
     </RadioGroup>
 
     <RelativeLayout
         android:id="@+id/root"
-        android:layout_width="338dp"
+        android:layout_width="match_parent"
         android:layout_height="362dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
