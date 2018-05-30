@@ -12,7 +12,6 @@ import java.util.Map;
 
 public class Alarm {
     public int id, hour, durationInMillis, minute, date, month, year;
-    SparseArray<String> month_dictionary = new SparseArray<>();
 
     public Alarm(){
     }
@@ -51,22 +50,8 @@ public class Alarm {
     }
 
     @Exclude
-    public String getMonth(){
-
-        month_dictionary.put(1, "Jan");
-        month_dictionary.put(2, "Feb");
-        month_dictionary.put(3, "Mar");
-        month_dictionary.put(4, "Apr");
-        month_dictionary.put(5, "May");
-        month_dictionary.put(6, "Jun");
-        month_dictionary.put(7, "Jul");
-        month_dictionary.put(8, "Aug");
-        month_dictionary.put(9, "Sep");
-        month_dictionary.put(10, "Oct");
-        month_dictionary.put(11, "Nov");
-        month_dictionary.put(12, "Dec");
-
-        return month_dictionary.get(month + 1);
+    public String getDateDisplay(){
+        return this.date + "-" + this.month + "-" + this.year;
     }
 
     @Exclude
