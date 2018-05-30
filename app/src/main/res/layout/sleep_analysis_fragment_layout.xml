@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp">
@@ -14,28 +13,43 @@
         android:text="Sleep Analysis"
         android:textSize="20sp" />
 
-    <Button
-        android:id="@+id/week_button"
-        android:layout_width="83dp"
-        android:layout_height="45dp"
-        android:layout_below="@+id/information"
-        android:layout_centerHorizontal="true"
-        android:text="Week" />
 
-    <Button
-        android:id="@+id/month_button"
-        android:layout_width="wrap_content"
+    <RadioGroup
+        android:layout_width="269dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/week_button"
-        android:layout_toEndOf="@+id/week_button"
-        android:text="Month" />
-
-    <Button
-        android:id="@+id/all_time_button"
-        android:layout_width="54dp"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/week_button"
         android:layout_alignParentEnd="true"
-        android:text="All" />
+        android:layout_below="@+id/information"
+        android:checkedButton="@+id/week_button"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/week_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Weekly" />
+
+        <RadioButton
+            android:id="@+id/month_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Monthly" />
+
+        <RadioButton
+            android:id="@+id/all_time_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="All" />
+    </RadioGroup>
+
+    <RelativeLayout
+        android:id="@+id/root"
+        android:layout_width="338dp"
+        android:layout_height="362dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp" />
 
 </RelativeLayout>

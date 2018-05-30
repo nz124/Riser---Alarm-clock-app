@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -39,7 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class SleepAnalysisFragment extends Fragment implements View.OnClickListener {
+public class SleepAnalysisFragment extends Fragment {
     LineData lineData;
     FirebaseUser currentUser;
     DatabaseReference myRef;
@@ -50,11 +51,12 @@ public class SleepAnalysisFragment extends Fragment implements View.OnClickListe
     String currentMonth;
     String currentYear;
 
-    Button showWeekChartButton;
-    Button showMonthChartButton;
-    Button showAllTimeChartButton;
+    Button showWeekChartRadioButton;
+    Button showMonthChartRadioButton;
+    Button showAllTimeChartRadioButton;
 
     View rootView;
+    RelativeLayout parentLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,7 +74,6 @@ public class SleepAnalysisFragment extends Fragment implements View.OnClickListe
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         firstDayOfWeek = new SimpleDateFormat("dd", Locale.US).format(calendar.getTime());
 
-        Log.e("hey", "onCreate: "+   currentMonth + "?" + firstDayOfWeek);
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Sleep Data");
@@ -85,14 +86,22 @@ public class SleepAnalysisFragment extends Fragment implements View.OnClickListe
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.sleep_analysis_fragment_layout, container, false);
+        // get parent layout in xml
+        parentLayout = rootView.findViewById(R.id.root);
 
-        showWeekChartButton = rootView.findViewById(R.id.week_button);
-        showWeekChartButton.setOnClickListener(this);
-        showMonthChartButton = rootView.findViewById(R.id.month_button);
-        showMonthChartButton.setOnClickListener(this);
-        showAllTimeChartButton = rootView.findViewById(R.id.all_time_button);
-        showAllTimeChartButton.setOnClickListener(this);
+        //Show week chart as default
+        showWeekChart(rootView);
 
+        showWeekChartRadioButton = rootView.findViewById(R.id.week_button);
+        showWeekChartRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showWeekChart(rootView);
+
+            }
+        });
+        showMonthChartRadioButton = rootView.findViewById(R.id.month_button);
+        showAllTimeChartRadioButton = rootView.findViewById(R.id.all_time_button);
 
         // l.setExtra(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
         // "def", "ghj", "ikl", "mno" });
@@ -129,16 +138,6 @@ public class SleepAnalysisFragment extends Fragment implements View.OnClickListe
         return rootView;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case (R.id.week_button):
-                showWeekChart(rootView);
-                break;
-            case (R.id.month_button):
-
-        }
-    }
 
     public void showWeekChart(final View rootView) {
         TextView info = rootView.findViewById(R.id.information);
@@ -147,41 +146,36 @@ public class SleepAnalysisFragment extends Fragment implements View.OnClickListe
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 int date;
-                int hour;
-                int minute;
-                int hourAndMinuteValue;
+                float hour;
+                float minute;
+                float hourAndMinuteValue;
                 String dayOfWeek = null;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     //Get only the dates within the current week
                     date = Integer.valueOf(data.getKey()) - Integer.valueOf(firstDayOfWeek);
-                    Log.e("FIND THIS", "onDataChange: "+ data.getKey() + "/" + firstDayOfWeek + "/" + date );
                     if (date < 7 && date >= 0){
-                        minute = Math.round(data.getValue(long.class) / (1000 * 60) % 60);
-                        hour = Math.round(data.getValue(long.class) / (1000 * 60 * 60) % 24);
-                        hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
-
+                        minute = data.getValue(long.class) / (1000 * 60) % 60;
+                        hour = data.getValue(long.class) / (1000 * 60 * 60) % 24;
+                        hourAndMinuteValue = hour + minute / 60 * 100;
+                        Log.e("fuck", "onDataChange: " + hour + "?" + minute );
+                        //Add data point
                         entries.add(new BarEntry(date, hourAndMinuteValue));
                     }
                 }
 
-                // programmatically create a LineChart and set size
+                // programmatically create a BarChart and set size
                 BarChart chart = new BarChart(getContext());
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                chart.setLayoutParams(new RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.MATCH_PARENT,
-                        1000
-                );
-                params.setMargins(0, 300, 0, 0);
-                chart.setLayoutParams(params);
+                        RelativeLayout.LayoutParams.MATCH_PARENT
+                ));
 
-                // get parent layout in xml
-                RelativeLayout rl = rootView.findViewById(R.id.root);
-                rl.addView(chart); // add the programmatically created chart
+
+                parentLayout.addView(chart); // add the programmatically created chart
 
                 chart.setDrawBarShadow(false);
                 chart.setDrawValueAboveBar(true);
-
                 chart.getDescription().setEnabled(false);
-
                 // if more than 60 entries are displayed in the chart, no values will be
                 // drawn
                 chart.setMaxVisibleValueCount(8);
