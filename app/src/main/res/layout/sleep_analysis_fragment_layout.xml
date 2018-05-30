@@ -4,39 +4,38 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp">
+    android:padding="10dp">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/information"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:gravity="center_vertical|center_horizontal"
         android:text="Sleep Analysis"
-        android:textSize="25sp" />
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/week_button"
-        android:layout_width="78dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="45dp"
+        android:layout_width="83dp"
+        android:layout_height="45dp"
+        android:layout_below="@+id/information"
+        android:layout_centerHorizontal="true"
         android:text="Week" />
 
     <Button
         android:id="@+id/month_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/week_button"
+        android:layout_alignBottom="@+id/week_button"
         android:layout_toEndOf="@+id/week_button"
         android:text="Month" />
 
     <Button
         android:id="@+id/all_time_button"
-        android:layout_width="wrap_content"
+        android:layout_width="54dp"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/week_button"
-        android:layout_toEndOf="@+id/month_button"
+        android:layout_alignBottom="@+id/week_button"
+        android:layout_alignParentEnd="true"
         android:text="All" />
 
 </RelativeLayout>
