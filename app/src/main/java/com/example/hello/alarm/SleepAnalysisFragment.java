@@ -96,8 +96,9 @@ public class SleepAnalysisFragment extends Fragment {
         showWeekChartRadioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Clear all current chart before creating a new one
+                parentLayout.removeAllViews();
                 showWeekChart(rootView);
-
             }
         });
         showMonthChartRadioButton = rootView.findViewById(R.id.month_button);
