@@ -43,7 +43,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Alarm goingOffAlarm = dataSnapshot.getValue(Alarm.class);
                 //Push alarm date and duration to sleep data
-                myRef.child("Sleep Data").child(goingOffAlarm.getDateDisplay()).setValue(goingOffAlarm.getDurationInMillis());
+                myRef.child("Sleep Data").child(goingOffAlarm.getMonth()).child(Integer.toString(goingOffAlarm.date)).setValue(goingOffAlarm.getDurationInMillis());
             }
 
             @Override

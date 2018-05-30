@@ -50,19 +50,17 @@ public class SleepAnalysisFragment extends Fragment {
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String date;
+                int date;
                 int hour;
                 int minute;
                 float hourAndMinuteValue;
                 for (DataSnapshot data : dataSnapshot.getChildren()){
-                    date = data.getKey();
+                    date = Integer.valueOf(data.getKey());
                     minute = data.getValue(int.class) / (1000*60) % 60;
                     hour   = data.getValue(int.class) / (1000*60*60) % 24;
-                    hourAndMinuteValue = hour + Math.round(minute/60*100);
+                    hourAndMinuteValue = hour +  minute/60*100;
 
-                    entries.add(new Entry(3, hourAndMinuteValue));
-                    entries.add(new Entry(1, hourAndMinuteValue));
-                    entries.add(new Entry(2, hourAndMinuteValue));
+                    entries.add(new Entry(date, hourAndMinuteValue));
                     Log.e("Hour and Minute", "onDataChange: "+ hourAndMinuteValue );
                 }
                 //// add entries and styles to dataset

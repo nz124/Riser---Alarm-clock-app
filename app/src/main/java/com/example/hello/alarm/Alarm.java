@@ -51,7 +51,7 @@ public class Alarm {
     }
 
     @Exclude
-    public String getDateDisplay(){
+    public String getMonth(){
 
         month_dictionary.put(1, "Jan");
         month_dictionary.put(2, "Feb");
@@ -66,7 +66,7 @@ public class Alarm {
         month_dictionary.put(11, "Nov");
         month_dictionary.put(12, "Dec");
 
-        return this.date + " " + month_dictionary.get(month + 1);
+        return month_dictionary.get(month + 1);
     }
 
     @Exclude
