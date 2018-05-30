@@ -5,10 +5,10 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import java.text.DecimalFormat;
 
-class MyAxisValueFormatter implements IAxisValueFormatter {
+class YAxisValueFormatter implements IAxisValueFormatter {
     private DecimalFormat mFormat;
 
-    public MyAxisValueFormatter() {
+    public YAxisValueFormatter() {
         mFormat = new DecimalFormat("###,###,###,##0.0");
     }
 

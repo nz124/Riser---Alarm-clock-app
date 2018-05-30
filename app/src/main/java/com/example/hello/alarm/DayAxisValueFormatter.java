@@ -18,6 +18,6 @@ class DayAxisValueFormatter implements IAxisValueFormatter {
 
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-        return mDayOfWeek[(int) value + 1];
+        return mDayOfWeek[(int) value];
     }
 }

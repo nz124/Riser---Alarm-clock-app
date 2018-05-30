@@ -16,11 +16,27 @@
 
     <Button
         android:id="@+id/week_button"
-        android:layout_width="match_parent"
+        android:layout_width="78dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="45dp"
-        android:text="Button" />
+        android:text="Week" />
+
+    <Button
+        android:id="@+id/month_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/week_button"
+        android:layout_toEndOf="@+id/week_button"
+        android:text="Month" />
+
+    <Button
+        android:id="@+id/all_time_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/week_button"
+        android:layout_toEndOf="@+id/month_button"
+        android:text="All" />
 
 </RelativeLayout>

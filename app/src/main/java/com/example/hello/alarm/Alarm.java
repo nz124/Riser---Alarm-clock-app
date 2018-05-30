@@ -12,6 +12,9 @@ import java.util.Map;
 
 public class Alarm {
     public int id, hour, durationInMillis, minute, date, month, year;
+    public String[] monthString = {
+            "Jan", "Feb", "Mar", "Wed", "Thu", "Fri", "Sat", "Sun"
+    };
 
     public Alarm(){
     }
@@ -49,10 +52,19 @@ public class Alarm {
         return this.hour + ": " + minute;
     }
 
-    @Exclude
-    public String getDateDisplay(){
-        return this.date + "-" + this.month + "-" + this.year;
+    public String getYear(){
+        return Integer.toString(this.year);
     }
+
+    public String getMonth(){
+        return Integer.toString(this.month);
+    }
+
+    @Exclude
+    public String getDate(){
+        return Integer.toString(this.date);
+    }
+
 
     @Exclude
     public int getTimeInMillis(){
