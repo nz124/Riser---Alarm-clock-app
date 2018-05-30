@@ -170,7 +170,8 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new AlarmListFragment(), "ONE");
         adapter.addFragment(new FriendListFragment(), "TWO");
-        adapter.addFragment(new StoreFragment(), "THREE");
+        adapter.addFragment(new SleepAnalysisFragment(), "THREE");
+        adapter.addFragment(new StoreFragment(), "FOUR");
         viewPager.setAdapter(adapter);
     }
 
@@ -208,8 +209,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void incrementPointAndSaveToDb(final FirebaseUser user, final boolean increment, final int point) {
-
         myRef = database.child(user.getUid()).child("point");
+
         //Get user's current point
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

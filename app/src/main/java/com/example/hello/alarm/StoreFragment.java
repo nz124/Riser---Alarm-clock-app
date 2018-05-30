@@ -118,7 +118,6 @@ public class StoreFragment extends Fragment {
             holder.itemTitle.setText(storeList.get(position).title);
             holder.itemPrice.setText(String.valueOf(storeList.get(position).price));
             holder.itemDescription.setText(storeList.get(position).description);
-
         }
 
         // Return the size of your dataset (invoked by the layout manager)

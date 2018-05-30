@@ -66,7 +66,6 @@ public class AlarmListFragment extends Fragment {
 
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,9 +185,13 @@ public class AlarmListFragment extends Fragment {
     public static void AddAlarm(final Context context, final int hour, final int minute, final int date, final int month, final int year){
         //Alarm Id
         final int alarm_id = new Random().nextInt();
+        final long currentTimeInMillis;
+        final int[] currentAlarmDuration = new int[1];
 
         alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         calendar = Calendar.getInstance();
+        currentTimeInMillis = calendar.getTimeInMillis();
+
         snoozeIntent = new Intent(context, SnoozeAlarm.class);
         cancelIntent = new Intent(context, AlarmNotification.class);
         cancelIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -209,8 +212,11 @@ public class AlarmListFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 boolean alarmExists = false;
+                int alarmDuration;
                 for (DataSnapshot data: dataSnapshot.getChildren()){
-                    if (Math.abs(calendar.getTimeInMillis() - data.getValue(Alarm.class).getTimeInMillis()) < 60000){
+                    alarmDuration = Math.abs((int) calendar.getTimeInMillis() - data.getValue(Alarm.class).getTimeInMillis());
+                    //If duration between alarms < 1 minute
+                    if (alarmDuration < 60000){
                         Toast.makeText(context, "You've already had another alarm scheduled within 1 minute", Toast.LENGTH_LONG).show();
                         alarmExists = true;
                     }
@@ -224,7 +230,8 @@ public class AlarmListFragment extends Fragment {
 
 
                     //Add alarm to user's database
-                    Alarm newAlarm = new Alarm(alarm_id, hour, minute, date, month - 1, year);
+                    currentAlarmDuration[0] = (int) (calendar.getTimeInMillis() - currentTimeInMillis);
+                    Alarm newAlarm = new Alarm(alarm_id, currentAlarmDuration[0], hour, minute, date, month - 1, year);
                     myRef.child(String.valueOf(alarm_id)).setValue(newAlarm.toMapAlarm());
 
 

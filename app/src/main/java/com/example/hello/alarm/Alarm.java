@@ -1,18 +1,21 @@
 package com.example.hello.alarm;
 
+import android.util.Log;
+
 import com.google.firebase.database.Exclude;
 
+import java.time.Month;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Alarm {
-    public int id, hour, minute, date, month, year;
+    public int id, hour, durationInMillis, minute, date, month, year;
 
     public Alarm(){
     }
 
-    public Alarm(int id, int hour, int minute, int date, int month, int year){
+    public Alarm(int id, int hour, int durationInMillis, int minute, int date, int month, int year){
         this.id = id;
         this.hour = hour;
         this.minute = minute;
@@ -44,10 +47,15 @@ public class Alarm {
         return this.hour + ": " + minute;
     }
 
+    public String getDateDisplay(){
+        Log.e("hy", "getDateDisplay: "+ Calendar.getInstance().get(month) );
+        return this.date + " " + Calendar.getInstance().get(month);
+    }
+
     @Exclude
-    public long getTimeInMillis(){
+    public int getTimeInMillis(){
         Calendar rightNow = Calendar.getInstance();
         rightNow.set(this.year, this.month, this.date, this.hour, this.minute);
-        return rightNow.getTimeInMillis();
+        return (int) rightNow.getTimeInMillis();
     }
 }
