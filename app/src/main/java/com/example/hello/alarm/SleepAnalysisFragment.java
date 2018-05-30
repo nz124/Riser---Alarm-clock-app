@@ -33,7 +33,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class SleepAnalysisFragment extends Fragment implements View.OnClickListener {
@@ -43,14 +49,24 @@ public class SleepAnalysisFragment extends Fragment implements View.OnClickListe
     List<BarEntry> entries;
     Button showWeekChartButton;
     View rootView;
+    HashMap<String, Integer> dayOfWeekToNumber;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        dayOfWeekToNumber = new HashMap<>();
+        dayOfWeekToNumber.put("Mon", 1);
+        dayOfWeekToNumber.put("Tue", 2);
+        dayOfWeekToNumber.put("Wed", 3);
+        dayOfWeekToNumber.put("Thu", 4);
+        dayOfWeekToNumber.put("Fri", 5);
+        dayOfWeekToNumber.put("Sat", 6);
+        dayOfWeekToNumber.put("Sun", 7);
+
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         //TO-DO: TURN THAT "MAY" INTO SOETHING ELSE
-        myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Sleep Data").child("May");
+        myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Sleep Data");
 
         Utils.init(getContext());
         entries = new ArrayList<BarEntry>();
@@ -112,18 +128,28 @@ public class SleepAnalysisFragment extends Fragment implements View.OnClickListe
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                int date;
+                String date;
                 int hour;
                 int minute;
                 int hourAndMinuteValue;
+                DateFormat dateString;
+                Date fullDate;
+                String dayOfWeek = null;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    date = Integer.valueOf(data.getKey());
+                    date = data.getKey();
+                    try {
+                        dateString =new SimpleDateFormat("EEE");
+                        fullDate = new SimpleDateFormat("dd-M-yyyy").parse(date);
+                        dayOfWeek = dateString.format(fullDate);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     minute = Math.round(data.getValue(long.class) / (1000 * 60) % 60);
                     hour = Math.round(data.getValue(long.class) / (1000 * 60 * 60) % 24);
                     hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
 
-                    entries.add(new BarEntry(date, hourAndMinuteValue));
-                    Log.e("Hour and Minute", "onDataChange: " + hourAndMinuteValue);
+                    entries.add(new BarEntry(dayOfWeekToNumber.get(dayOfWeek), hourAndMinuteValue));
+                    Log.e("Hour and Minute", "onDataChange: " + dayOfWeek + dayOfWeekToNumber.get(dayOfWeek)+ hourAndMinuteValue);
                 }
 
                 // programmatically create a LineChart and set size

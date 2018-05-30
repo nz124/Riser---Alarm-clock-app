@@ -22,7 +22,7 @@ public class Alarm {
         this.durationInMillis = durationInMillis;
         this.minute = minute;
         this.date = date;
-        this.month = month;
+        this.month = month + 1;
         this.year = year;
     }
 
