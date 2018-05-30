@@ -36,7 +36,8 @@ public class SleepAnalysisFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Sleep Data");
+        //TO-DO: TURN THAT "MAY" INTO SOETHING ELSE
+        myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Sleep Data").child("May");
 
         Utils.init(getContext());
         entries = new ArrayList<Entry>();
@@ -53,12 +54,12 @@ public class SleepAnalysisFragment extends Fragment {
                 int date;
                 int hour;
                 int minute;
-                float hourAndMinuteValue;
+                int hourAndMinuteValue;
                 for (DataSnapshot data : dataSnapshot.getChildren()){
                     date = Integer.valueOf(data.getKey());
-                    minute = data.getValue(int.class) / (1000*60) % 60;
-                    hour   = data.getValue(int.class) / (1000*60*60) % 24;
-                    hourAndMinuteValue = hour +  minute/60*100;
+                    minute = Math.round(data.getValue(long.class) / (1000*60) % 60);
+                    hour   = Math.round(data.getValue(long.class) / (1000*60*60) % 24);
+                    hourAndMinuteValue = Math.round(hour +  minute/60*100);
 
                     entries.add(new Entry(date, hourAndMinuteValue));
                     Log.e("Hour and Minute", "onDataChange: "+ hourAndMinuteValue );
