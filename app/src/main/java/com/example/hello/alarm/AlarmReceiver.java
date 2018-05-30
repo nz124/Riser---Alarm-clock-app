@@ -3,6 +3,7 @@ package com.example.hello.alarm;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -37,12 +38,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         //Retrieve alarm's id and cancel reminding notification on status bar
         final int alarm_id = intent.getIntExtra("alarm_id", 0);
         MainActivity.clearNotification(context, alarm_id);
-
-        myRef.child(String.valueOf(alarm_id)).addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.child("Alarms").child(Integer.toString(alarm_id)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                alarmTime = dataSnapshot.getValue(Alarm.class).getDateDisplay();
-                myRef.child("Sleep durations").child();
+                Alarm goingOffAlarm = dataSnapshot.getValue(Alarm.class);
+                //Push alarm date and duration to sleep data
+                myRef.child("Sleep Data").child(goingOffAlarm.getDateDisplay()).setValue(goingOffAlarm.getDurationInMillis());
             }
 
             @Override

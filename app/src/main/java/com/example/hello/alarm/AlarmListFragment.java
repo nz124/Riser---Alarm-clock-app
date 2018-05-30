@@ -82,6 +82,7 @@ public class AlarmListFragment extends Fragment {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 //Add alarm to list view
                 Alarm newAlarm = dataSnapshot.getValue(Alarm.class);
+                newAlarm.setId(Integer.valueOf(dataSnapshot.getKey()));
                 adapter.add(newAlarm);
             }
 
@@ -168,8 +169,9 @@ public class AlarmListFragment extends Fragment {
                     //Clear reminding notification on the status bar
                     MainActivity.clearNotification(getContext(), alarm.id);
 
+                    Log.e("yo", "onClick: "+ alarm.id + "/" + myRef.child(String.valueOf(alarm.id)));
                     //Remove the alarm from the database
-                    myRef.child(String.valueOf(alarm.id)).removeValue();
+                    myRef.child(Integer.toString(alarm.id)).removeValue();
                     alarm_data.remove(alarm);
                     notifyDataSetChanged();
 
