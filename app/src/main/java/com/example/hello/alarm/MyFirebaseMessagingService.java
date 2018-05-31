@@ -57,15 +57,19 @@ public class MyFirebaseMessagingService extends com.google.firebase.messaging.Fi
 
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "channel_id");
-        String challengeMessage = data.get("challenge_message");
-        if (challengeMessage != null && !"".equals(challengeMessage)){
-            notificationBuilder
-                    .setContentTitle(notification.getTitle())
-                    .setContentText(challengeMessage)
-                    .setSmallIcon(R.drawable.ic_challenge_icon)
-                    .addAction(acceptChallengeAction)
-                    .addAction(declineChallengeAction)
-                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+        notificationBuilder
+                .setContentTitle(notification.getTitle())
+                .setContentText(notification.getBody())
+                .setSmallIcon(R.drawable.ic_challenge_icon)
+                .addAction(acceptChallengeAction)
+                .addAction(declineChallengeAction)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+
+
+        String challengerID = data.get("challenger_ID");
+        Log.e("Get challenge message", "handleNow: "+ challengerID );
+        if (challengerID != null && !"".equals(challengerID)){
+            Log.e("ID", "handleNow: " + challengerID );
         }
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(0, notificationBuilder.build());
