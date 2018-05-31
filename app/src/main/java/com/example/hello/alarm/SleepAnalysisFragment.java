@@ -58,6 +58,10 @@ public class SleepAnalysisFragment extends Fragment {
     View rootView;
     RelativeLayout parentLayout;
 
+    String[] MONTHS = {
+            "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -220,6 +224,8 @@ public class SleepAnalysisFragment extends Fragment {
     }
 
     public void showYearChart(final View rootView) {
+        TextView info = rootView.findViewById(R.id.information);
+        info.setText("Sleep Analysis ( Year of " + currentYear + " )");
         myRef.child(currentYear).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -320,6 +326,8 @@ public class SleepAnalysisFragment extends Fragment {
     }
 
     public void showMonthChart(final View rootView) {
+        TextView info = rootView.findViewById(R.id.information);
+        info.setText("Sleep Analysis (Month Of" + MONTHS[Integer.valueOf(currentMonth)-1] + " )");
         myRef.child(currentYear).child(currentMonth).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
