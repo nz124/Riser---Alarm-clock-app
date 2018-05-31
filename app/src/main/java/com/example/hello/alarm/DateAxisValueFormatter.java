@@ -18,6 +18,9 @@ class DateAxisValueFormatter implements IAxisValueFormatter {
     public String getFormattedValue(float value, AxisBase axis) {
         String suffix = "th";
         switch ((int) value){
+            case 0:
+                suffix = "st";
+                value = 1;
             case 1:
                 suffix = "st";
                 break;

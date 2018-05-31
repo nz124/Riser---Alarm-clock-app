@@ -192,14 +192,12 @@ public class SleepAnalysisFragment extends Fragment {
                 leftAxis.setLabelCount(8, false);
                 leftAxis.setValueFormatter(custom);
                 leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-                leftAxis.setSpaceTop(15f);
                 leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
                 YAxis rightAxis = chart.getAxisRight();
                 rightAxis.setDrawGridLines(false);
                 rightAxis.setLabelCount(8, false);
                 rightAxis.setValueFormatter(custom);
-                rightAxis.setSpaceTop(15f);
                 rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
                 Legend l = chart.getLegend();
@@ -291,15 +289,13 @@ public class SleepAnalysisFragment extends Fragment {
                 leftAxis.setLabelCount(8, false);
                 leftAxis.setValueFormatter(custom);
                 leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-                leftAxis.setSpaceTop(15f);
-                leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+                leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(false)
 
                 YAxis rightAxis = chart.getAxisRight();
                 rightAxis.setDrawGridLines(false);
                 rightAxis.setLabelCount(8, false);
                 rightAxis.setValueFormatter(custom);
-                rightAxis.setSpaceTop(15f);
-                rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+                rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(false)
 
                 Legend l = chart.getLegend();
                 l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -385,15 +381,13 @@ public class SleepAnalysisFragment extends Fragment {
                 leftAxis.setLabelCount(8, false);
                 leftAxis.setValueFormatter(custom);
                 leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-                leftAxis.setSpaceTop(15f);
-                leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+                leftAxis.setAxisMinimum(0f);
 
                 YAxis rightAxis = chart.getAxisRight();
                 rightAxis.setDrawGridLines(false);
                 rightAxis.setLabelCount(8, false);
                 rightAxis.setValueFormatter(custom);
-                rightAxis.setSpaceTop(15f);
-                rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+                rightAxis.setAxisMinimum(0f);
 
                 Legend l = chart.getLegend();
                 l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
