@@ -232,15 +232,12 @@ public class SleepAnalysisFragment extends Fragment {
                 float hour;
                 float minute;
                 float hourAndMinuteValue;
-                int day;
                 List<BarEntry> yearData = new ArrayList<>();
                 for (DataSnapshot month : dataSnapshot.getChildren()) {
                     float totalTimeInMillis = 0;
                     float averageTimeInMillis = 0;
                     int alarmCounts = 1;
-                    float averageHoursPerMonth = 0;
                     for (DataSnapshot date: month.getChildren()){
-                        Log.e("what's up dude", "onDataChange: "+ month.getKey() + "/" +date.getKey() +"/" + date.getValue());
                         totalTimeInMillis += date.getValue(long.class);
                         alarmCounts += 1;
                     }
@@ -327,7 +324,7 @@ public class SleepAnalysisFragment extends Fragment {
 
     public void showMonthChart(final View rootView) {
         TextView info = rootView.findViewById(R.id.information);
-        info.setText("Sleep Analysis (Month Of" + MONTHS[Integer.valueOf(currentMonth)-1] + " )");
+        info.setText("Sleep Analysis (Month Of " + MONTHS[Integer.valueOf(currentMonth)-1] + " )");
         myRef.child(currentYear).child(currentMonth).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
