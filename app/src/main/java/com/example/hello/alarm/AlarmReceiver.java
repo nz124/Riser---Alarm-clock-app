@@ -39,11 +39,13 @@ public class AlarmReceiver extends BroadcastReceiver {
         //Retrieve alarm's id and cancel reminding notification on status bar
         final int alarm_id = intent.getIntExtra("alarm_id", 0);
         MainActivity.clearNotification(context, alarm_id);
+
+        //Check if alarm is long enough to add to sleep analysis data
         myRef.child("Alarms").child(Integer.toString(alarm_id)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Alarm goingOffAlarm = dataSnapshot.getValue(Alarm.class);
-                //Check if the alarm is more than approx ~ four hours
+                //if the alarm is more than approx ~ four hours
                 if (goingOffAlarm.getDurationInMillis() > 14000000){
                     //Push alarm date and duration to sleep data
                     myRef.child("Sleep Data").child(goingOffAlarm.getYear()).child(goingOffAlarm.getMonth()).child(goingOffAlarm.getDate()).setValue(goingOffAlarm.getDurationInMillis());

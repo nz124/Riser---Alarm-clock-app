@@ -239,12 +239,12 @@ public class AlarmListFragment extends Fragment {
 
                     //Show a persistent notification on notification bar
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Alarm Channel")
-                            .setSmallIcon(R.drawable.alarmclock)
+                            .setSmallIcon(R.drawable.ic_alarm_check)
                             .setContentTitle(newAlarm.getTimeDisplay())
                             .setContentText("You have the next alarm at " + newAlarm.getTimeDisplay())
                             .setPriority(NotificationManagerCompat.IMPORTANCE_LOW)
-                            .addAction(R.drawable.alarmclock, "Turn Off", turn_off_intent)
-                            .addAction(R.drawable.alarmclock, "Add 10 minutes", snooze_intent);
+                            .addAction(R.drawable.ic_alarm_off, "Turn Off", turn_off_intent)
+                            .addAction(R.drawable.ic_alarm_snooze, "Add 10 minutes", snooze_intent);
                     Notification mNotification = builder.build();
                     mNotification.flags = Notification.FLAG_NO_CLEAR;
                     NotificationManagerCompat notification= NotificationManagerCompat.from(context);
