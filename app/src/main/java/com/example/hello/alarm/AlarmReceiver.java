@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,7 +27,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     String alarmTime;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid());
 
@@ -42,8 +43,14 @@ public class AlarmReceiver extends BroadcastReceiver {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Alarm goingOffAlarm = dataSnapshot.getValue(Alarm.class);
-                //Push alarm date and duration to sleep data
-                myRef.child("Sleep Data").child(goingOffAlarm.getYear()).child(goingOffAlarm.getMonth()).child(goingOffAlarm.getDate()).setValue(goingOffAlarm.getDurationInMillis());
+                //Check if the alarm is more than approx ~ four hours
+                if (goingOffAlarm.getDurationInMillis() > 14000000){
+                    //Push alarm date and duration to sleep data
+                    myRef.child("Sleep Data").child(goingOffAlarm.getYear()).child(goingOffAlarm.getMonth()).child(goingOffAlarm.getDate()).setValue(goingOffAlarm.getDurationInMillis());
+                }
+                else {
+                    Toast.makeText(context, "You haven't slept long enough for the data to be used for sleep analysis", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override

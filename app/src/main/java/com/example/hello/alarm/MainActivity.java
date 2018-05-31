@@ -67,12 +67,17 @@ public class MainActivity extends AppCompatActivity {
     Uri mPhotoUri;
     private FirebaseAuth mAuth;
     AuthCredential credential;
-    Integer user_point;
+
+    boolean sleepAnalysisFragment = false;
 
     public static Intent createIntent(Context context, IdpResponse idpResponse) {
         return new Intent().setClass(context, MainActivity.class)
                 .putExtra(ExtraConstants.EXTRA_IDP_RESPONSE, idpResponse);
     }
+
+    public static void  restartActivity(Context context) {
+        context.startActivity(new Intent(context, MainActivity.class));
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,14 +108,14 @@ public class MainActivity extends AppCompatActivity {
         String notification = "";
         if (action_type != null) {
             if (action_type.equals("turn_off")) {
-                incrementPointAndSaveToDb(currentUser, true, 100);
+                incrementPointAndSaveToDb(getApplicationContext(), currentUser, true, 100);
                 notification = "You gained 100 points";
             } else {
-                incrementPointAndSaveToDb(currentUser, false, 100);
+                incrementPointAndSaveToDb(getApplicationContext(), currentUser, false, 100);
                 notification = "You lost 100 points";
             }
             Toast.makeText(this, notification,
-                    Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_SHORT).show();
         }
 
         //Sign user in anonymously
@@ -123,6 +128,29 @@ public class MainActivity extends AppCompatActivity {
             //Convert guest account to Facebook/Google account if possible
             linkAccount();
         }
+
+        //Prepare viewpager and add circle indicator for view pager
+        final ViewPager viewPager = findViewById(R.id.viewpager);
+
+        final CircleIndicator indicator = findViewById(R.id.indicator);
+
+        //Show fragments and functions properly depending on user's purchased items
+        database.child(currentUser.getUid()).child("Items").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child("Sleep Tracker").getValue() != null){
+                    sleepAnalysisFragment = true;
+                }
+                Log.e("TRUE OR FALSE", "onDataChange: " + dataSnapshot.child("Sleep Tracker"));
+                setupViewPager(viewPager, sleepAnalysisFragment);
+                indicator.setViewPager(viewPager);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
         //Configure action bar
@@ -156,21 +184,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        //Prepare viewpager and add circle indicator for view pager
-        ViewPager viewPager = findViewById(R.id.viewpager);
-
-        CircleIndicator indicator = findViewById(R.id.indicator);
-        setupViewPager(viewPager);
-        indicator.setViewPager(viewPager);
-
-
     }
 
-    public void setupViewPager(ViewPager viewPager) {
+    public void setupViewPager(ViewPager viewPager, boolean sleepAnalysis) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new AlarmListFragment(), "ONE");
         adapter.addFragment(new FriendListFragment(), "TWO");
-        adapter.addFragment(new SleepAnalysisFragment(), "THREE");
+        if (sleepAnalysis){
+            adapter.addFragment(new SleepAnalysisFragment(), "THREE");
+        }
         adapter.addFragment(new StoreFragment(), "FOUR");
         viewPager.setAdapter(adapter);
     }
@@ -208,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void incrementPointAndSaveToDb(final FirebaseUser user, final boolean increment, final int point) {
+    public static void incrementPointAndSaveToDb(final Context context, final FirebaseUser user, final boolean increment, final int point) {
         myRef = database.child(user.getUid()).child("point");
 
         //Get user's current point
@@ -226,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                 Map<String, Object> childUpdate = new HashMap<>();
                 childUpdate.put("/"+ user.getUid() + "/" + "point", updatedPoint);
                 database.updateChildren(childUpdate);
-                Log.e("why", "onDataChange: "+ updatedPoint );
+                Toast.makeText(context, "You have "+ updatedPoint + " left!", Toast.LENGTH_LONG).show();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -306,7 +328,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUI(FirebaseUser user){
-        Log.e("updateui", "updateUI: "+"im' called" );
         if (user.isAnonymous()) {
             //Display sign in and sign out buttons
             nav_sign_in.setVisible(true);
@@ -347,6 +368,5 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         database.child(currentUser.getUid()).removeEventListener(eventListener);
     }
-
 
 }

@@ -4,12 +4,10 @@ package com.example.hello.alarm;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -62,6 +60,11 @@ public class SleepAnalysisFragment extends Fragment {
             "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
     };
 
+    public SleepAnalysisFragment() {
+        // Required empty public constructor
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +92,8 @@ public class SleepAnalysisFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.sleep_analysis_fragment_layout, container, false);
+
+
         // get parent layout in xml
         parentLayout = rootView.findViewById(R.id.root);
 
@@ -413,4 +418,5 @@ public class SleepAnalysisFragment extends Fragment {
             }
         });
     }
+
 }
