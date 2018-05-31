@@ -46,7 +46,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Alarm goingOffAlarm = dataSnapshot.getValue(Alarm.class);
                 //if the alarm is more than approx ~ four hours
-                if (goingOffAlarm.getDurationInMillis() > 14000000){
+                if (goingOffAlarm != null && goingOffAlarm.getDurationInMillis() > 14000000){
                     //Push alarm date and duration to sleep data
                     myRef.child("Sleep Data").child(goingOffAlarm.getYear()).child(goingOffAlarm.getMonth()).child(goingOffAlarm.getDate()).setValue(goingOffAlarm.getDurationInMillis());
                 }
