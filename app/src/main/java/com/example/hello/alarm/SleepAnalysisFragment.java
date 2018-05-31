@@ -1,6 +1,7 @@
 package com.example.hello.alarm;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -21,6 +23,7 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.utils.Utils;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,7 +53,7 @@ public class SleepAnalysisFragment extends Fragment {
 
     Button showWeekChartRadioButton;
     Button showMonthChartRadioButton;
-    Button showAllTimeChartRadioButton;
+    Button showYearChartRadioButton;
 
     View rootView;
     RelativeLayout parentLayout;
@@ -105,39 +108,20 @@ public class SleepAnalysisFragment extends Fragment {
                 showMonthChart(rootView);
             }
         });
-        showAllTimeChartRadioButton = rootView.findViewById(R.id.all_time_button);
+        showYearChartRadioButton = rootView.findViewById(R.id.year_button);
+        showYearChartRadioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parentLayout.removeAllViews();
+                showYearChart(rootView);
+            }
+        });
 
         // l.setExtra(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
         // "def", "ghj", "ikl", "mno" });
         // l.setCustom(ColorTemplate.VORDIPLOM_COLORS, new String[] { "abc",
         // "def", "ghj", "ikl", "mno" });
         //// add entries and styles to dataset
-//                LineDataSet dataSet = new LineDataSet(entries, "Time");
-//
-//                dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-//                dataSet.setCubicIntensity(0.2f);
-//                dataSet.setDrawFilled(true);
-//                dataSet.setDrawCircles(false);
-//                dataSet.setLineWidth(1.8f);
-//                dataSet.setCircleRadius(4f);
-//                dataSet.setCircleColor(android.R.color.white);
-//                dataSet.setHighLightColor(Color.rgb(244, 117, 117));
-//                dataSet.setColor(Color.WHITE);
-//                dataSet.setFillColor(Color.WHITE);
-//                dataSet.setFillAlpha(100);
-//                dataSet.setDrawHorizontalHighlightIndicator(false);
-//
-//                lineData = new LineData(dataSet);
-//
-//                LineChart chart = rootView.findViewById(R.id.sleep_chart);
-//                chart.setData(lineData);
-//                chart.getXAxis().setDrawGridLines(false);
-//                chart.invalidate(); // refresh
-//                Log.e("hey", "onDataChange: "+"what happens second" );
-//            }
-//
-//
-//        });
 
         return rootView;
     }
@@ -235,6 +219,106 @@ public class SleepAnalysisFragment extends Fragment {
         });
     }
 
+    public void showYearChart(final View rootView) {
+        myRef.child(currentYear).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                float hour;
+                float minute;
+                float hourAndMinuteValue;
+                int day;
+                List<BarEntry> yearData = new ArrayList<>();
+                for (DataSnapshot month : dataSnapshot.getChildren()) {
+                    float totalTimeInMillis = 0;
+                    float averageTimeInMillis = 0;
+                    int alarmCounts = 1;
+                    float averageHoursPerMonth = 0;
+                    for (DataSnapshot date: month.getChildren()){
+                        Log.e("what's up dude", "onDataChange: "+ month.getKey() + "/" +date.getKey() +"/" + date.getValue());
+                        totalTimeInMillis += date.getValue(long.class);
+                        alarmCounts += 1;
+                    }
+                    averageTimeInMillis = totalTimeInMillis / alarmCounts;
+                    minute = averageTimeInMillis / (1000 * 60) % 60;
+                    hour =averageTimeInMillis / (1000 * 60 * 60) % 24;
+                    hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
+
+                    yearData.add(new BarEntry(Integer.valueOf(month.getKey()), hourAndMinuteValue));
+                }
+
+                // programmatically create a LineChart and set size
+                BarChart chart = new BarChart(getContext());
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                );
+
+                chart.setLayoutParams(params);
+
+                parentLayout.addView(chart); // add the programmatically created chart
+
+                chart.setDrawBarShadow(false);
+                chart.setDrawValueAboveBar(true);
+
+                chart.getDescription().setEnabled(false);
+
+                // if more than 31 entries are displayed in the chart, no values will be
+                // drawn
+                chart.setMaxVisibleValueCount(31);
+
+                // scaling can now only be done on x- and y-axis separately
+                chart.setPinchZoom(false);
+
+                chart.setDrawGridBackground(false);
+                // mChart.setDrawYLabels(false);
+
+                IAxisValueFormatter xAxisFormatter = new MonthAxisValueFormatter(chart);
+
+                XAxis xAxis = chart.getXAxis();
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setDrawGridLines(false);
+                xAxis.setGranularity(1f); // only intervals of 1 day
+                xAxis.setLabelCount(12);
+//                xAxis.setCenterAxisLabels(true);
+                xAxis.setValueFormatter(xAxisFormatter);
+
+                IAxisValueFormatter custom = new YAxisValueFormatter();
+
+                YAxis leftAxis = chart.getAxisLeft();
+                leftAxis.setLabelCount(8, false);
+                leftAxis.setValueFormatter(custom);
+                leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+                leftAxis.setSpaceTop(15f);
+                leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+                YAxis rightAxis = chart.getAxisRight();
+                rightAxis.setDrawGridLines(false);
+                rightAxis.setLabelCount(8, false);
+                rightAxis.setValueFormatter(custom);
+                rightAxis.setSpaceTop(15f);
+                rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+                Legend l = chart.getLegend();
+                l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+                l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+                l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+                l.setDrawInside(false);
+                l.setForm(Legend.LegendForm.SQUARE);
+                l.setFormSize(9f);
+                l.setTextSize(11f);
+                l.setXEntrySpace(4f);
+
+                BarDataSet dataSet = new BarDataSet(yearData, "Sleeping Time");
+                BarData data = new BarData(dataSet);
+                chart.setData(data);
+                chart.invalidate();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
     public void showMonthChart(final View rootView) {
         myRef.child(currentYear).child(currentMonth).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -242,40 +326,49 @@ public class SleepAnalysisFragment extends Fragment {
                 float hour;
                 float minute;
                 float hourAndMinuteValue;
-                List<BarEntry> monthData = new ArrayList<>();
+                List<Entry> monthData = new ArrayList<>();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
 
                     minute = Math.round(data.getValue(long.class) / (1000 * 60) % 60);
                     hour = Math.round(data.getValue(long.class) / (1000 * 60 * 60) % 24);
                     hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
 
-                    monthData.add(new BarEntry(Integer.valueOf(data.getKey()), hourAndMinuteValue));
-                    Log.e("ANSWER ME", "onDataChange: "+Integer.valueOf(data.getKey()));
+                    monthData.add(new Entry(Integer.valueOf(data.getKey()), hourAndMinuteValue));
                 }
 
                 // programmatically create a LineChart and set size
-                BarChart chart = new BarChart(getContext());
+                LineChart chart = new LineChart(getContext());
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.MATCH_PARENT,
-                        1000
+                        ViewGroup.LayoutParams.MATCH_PARENT
                 );
 
-                params.setMargins(0, 300, 0, 0);
+
+
+                LineDataSet dataSet = new LineDataSet(monthData, "Sleeping Time");
+                dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+                dataSet.setCubicIntensity(0.2f);
+                dataSet.setDrawFilled(true);
+                dataSet.setDrawCircles(false);
+                dataSet.setLineWidth(1.8f);
+                dataSet.setCircleRadius(4f);
+                dataSet.setCircleColor(android.R.color.white);
+                dataSet.setHighLightColor(Color.GRAY);
+                dataSet.setColor(Color.GRAY);
+                dataSet.setFillColor(Color.GRAY);
+                dataSet.setFillAlpha(100);
+                dataSet.setDrawHorizontalHighlightIndicator(false);
+
+                lineData = new LineData(dataSet);
 
                 chart.setLayoutParams(params);
+                parentLayout.addView(chart); // add the programmatically created chart
 
-                // get parent layout in xml
-                RelativeLayout rl = rootView.findViewById(R.id.root);
-                rl.addView(chart); // add the programmatically created chart
+                chart.setData(lineData);
+                chart.getXAxis().setDrawGridLines(false);
+                chart.invalidate(); // refresh
 
-                chart.setDrawBarShadow(false);
-                chart.setDrawValueAboveBar(true);
 
-                chart.getDescription().setEnabled(false);
-
-                // if more than 60 entries are displayed in the chart, no values will be
-                // drawn
-                chart.setMaxVisibleValueCount(30);
 
                 // scaling can now only be done on x- and y-axis separately
                 chart.setPinchZoom(false);
@@ -289,7 +382,7 @@ public class SleepAnalysisFragment extends Fragment {
                 xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
                 xAxis.setDrawGridLines(false);
                 xAxis.setGranularity(1f); // only intervals of 1 day
-                xAxis.setLabelCount(10);
+//                xAxis.setLabelCount(10);
                 xAxis.setCenterAxisLabels(true);
                 xAxis.setValueFormatter(xAxisFormatter);
 
@@ -319,10 +412,6 @@ public class SleepAnalysisFragment extends Fragment {
                 l.setTextSize(11f);
                 l.setXEntrySpace(4f);
 
-                BarDataSet dataSet = new BarDataSet(monthData, "Sleeping Time");
-                BarData data = new BarData(dataSet);
-                chart.setData(data);
-                chart.invalidate();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {

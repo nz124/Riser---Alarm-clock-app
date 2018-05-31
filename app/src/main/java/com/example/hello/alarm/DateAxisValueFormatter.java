@@ -14,8 +14,8 @@ class DateAxisValueFormatter implements IAxisValueFormatter {
 
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-        return (int) value+"th";
-
+        value = (int) Math.round(value);
+        return String.valueOf(value);
     }
 }
 
