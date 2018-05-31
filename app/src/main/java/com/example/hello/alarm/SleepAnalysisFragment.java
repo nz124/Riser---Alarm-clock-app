@@ -364,17 +364,6 @@ public class SleepAnalysisFragment extends Fragment {
                 chart.setLayoutParams(params);
                 parentLayout.addView(chart); // add the programmatically created chart
 
-                chart.setData(lineData);
-                chart.getXAxis().setDrawGridLines(false);
-                chart.invalidate(); // refresh
-
-
-
-                // scaling can now only be done on x- and y-axis separately
-                chart.setPinchZoom(false);
-
-                chart.setDrawGridBackground(false);
-                // mChart.setDrawYLabels(false);
 
                 IAxisValueFormatter xAxisFormatter = new DateAxisValueFormatter(chart);
 
@@ -382,7 +371,6 @@ public class SleepAnalysisFragment extends Fragment {
                 xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
                 xAxis.setDrawGridLines(false);
                 xAxis.setGranularity(1f); // only intervals of 1 day
-//                xAxis.setLabelCount(10);
                 xAxis.setCenterAxisLabels(true);
                 xAxis.setValueFormatter(xAxisFormatter);
 
@@ -411,6 +399,14 @@ public class SleepAnalysisFragment extends Fragment {
                 l.setFormSize(9f);
                 l.setTextSize(11f);
                 l.setXEntrySpace(4f);
+
+                // scaling can now only be done on x- and y-axis separately
+                chart.setPinchZoom(false);
+                chart.setDrawGridBackground(false);
+                // chart.setDrawYLabels(false);
+                chart.setData(lineData);
+                chart.getXAxis().setDrawGridLines(false);
+                chart.invalidate(); // refresh
 
             }
             @Override
