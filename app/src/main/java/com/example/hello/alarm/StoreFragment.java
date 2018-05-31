@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,10 +107,6 @@ public class StoreFragment extends Fragment {
             LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.store_item, parent, false);
 
-            //Get database reference to user's item list
-            currentUser = FirebaseAuth.getInstance().getCurrentUser();
-            myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Items");
-
             return new ViewHolder(v);
         }
 
@@ -131,6 +128,9 @@ public class StoreFragment extends Fragment {
                 holder.itemPurchaseButton.setText("Activated");
                 holder.itemPurchaseButton.setEnabled(false);
             }
+            //Get database reference to user's item list
+            currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Items");
             holder.itemPurchaseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

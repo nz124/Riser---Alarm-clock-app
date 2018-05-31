@@ -12,9 +12,14 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService{
     @Override
     public void onTokenRefresh() {
-        // Get updated InstanceID token.
-        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.e("", "Refreshed token: " + refreshedToken);
+        String refreshedToken;
+        try {
+            refreshedToken = FirebaseInstanceId.getInstance().getToken();
+            Log.d("", "Refreshed token: " + refreshedToken);
+        } catch (Exception e) {
+            Log.d("", "Refreshed token, catch: " + e.toString());
+            e.printStackTrace();
+        }
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the

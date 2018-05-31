@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
@@ -143,82 +144,93 @@ public class SleepAnalysisFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<BarEntry> weekData = new ArrayList<>();
+                boolean dataExists = false;
                 int date;
                 float hour;
                 float minute;
                 float hourAndMinuteValue;
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    //Get only the dates within the current week
-                    date = Integer.valueOf(data.getKey()) - Integer.valueOf(firstDayOfWeek);
-                    if (date < 7 && date >= 0){
-                        minute = data.getValue(long.class) / (1000 * 60) % 60;
-                        hour = data.getValue(long.class) / (1000 * 60 * 60) % 24;
-                        hourAndMinuteValue = hour + minute / 60 * 100;
-                        //Add data point
-                        weekData.add(new BarEntry(date, hourAndMinuteValue));
+                    if (data.getValue() != null){
+                        dataExists = true;
+                        //Get only the dates within the current week
+                        date = Integer.valueOf(data.getKey()) - Integer.valueOf(firstDayOfWeek);
+                        if (date < 7 && date >= 0){
+                            minute = data.getValue(long.class) / (1000 * 60) % 60;
+                            hour = data.getValue(long.class) / (1000 * 60 * 60) % 24;
+                            hourAndMinuteValue = hour + minute / 60 * 100;
+                            //Add data point
+                            weekData.add(new BarEntry(date, hourAndMinuteValue));
+                        }
                     }
+
                 }
 
-                // programmatically create a BarChart and set size
-                BarChart chart = new BarChart(getContext());
-                chart.setLayoutParams(new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        RelativeLayout.LayoutParams.MATCH_PARENT
-                ));
+                if (dataExists){
+                    // programmatically create a BarChart and set size
+                    BarChart chart = new BarChart(getContext());
+                    chart.setLayoutParams(new RelativeLayout.LayoutParams(
+                            RelativeLayout.LayoutParams.MATCH_PARENT,
+                            RelativeLayout.LayoutParams.MATCH_PARENT
+                    ));
 
 
-                parentLayout.addView(chart); // add the programmatically created chart
+                    parentLayout.addView(chart); // add the programmatically created chart
 
-                chart.setDrawBarShadow(false);
-                chart.setDrawValueAboveBar(true);
-                chart.getDescription().setEnabled(false);
-                // if more than 60 entries are displayed in the chart, no values will be
-                // drawn
-                chart.setMaxVisibleValueCount(8);
+                    chart.setDrawBarShadow(false);
+                    chart.setDrawValueAboveBar(true);
+                    chart.getDescription().setEnabled(false);
+                    // if more than 60 entries are displayed in the chart, no values will be
+                    // drawn
+                    chart.setMaxVisibleValueCount(8);
 
-                // scaling can now only be done on x- and y-axis separately
-                chart.setPinchZoom(false);
+                    // scaling can now only be done on x- and y-axis separately
+                    chart.setPinchZoom(false);
 
-                chart.setDrawGridBackground(false);
-                // mChart.setDrawYLabels(false);
+                    chart.setDrawGridBackground(false);
+                    // mChart.setDrawYLabels(false);
 
-                IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(chart);
+                    IAxisValueFormatter xAxisFormatter = new DayAxisValueFormatter(chart);
 
-                XAxis xAxis = chart.getXAxis();
-                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-                xAxis.setDrawGridLines(false);
-                xAxis.setGranularity(1f); // only intervals of 1 day
-                xAxis.setLabelCount(7);
-                xAxis.setValueFormatter(xAxisFormatter);
+                    XAxis xAxis = chart.getXAxis();
+                    xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                    xAxis.setDrawGridLines(false);
+                    xAxis.setGranularity(1f); // only intervals of 1 day
+                    xAxis.setLabelCount(7);
+                    xAxis.setValueFormatter(xAxisFormatter);
 
-                IAxisValueFormatter custom = new YAxisValueFormatter();
+                    IAxisValueFormatter custom = new YAxisValueFormatter();
 
-                YAxis leftAxis = chart.getAxisLeft();
-                leftAxis.setLabelCount(8, false);
-                leftAxis.setValueFormatter(custom);
-                leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-                leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+                    YAxis leftAxis = chart.getAxisLeft();
+                    leftAxis.setLabelCount(8, false);
+                    leftAxis.setValueFormatter(custom);
+                    leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+                    leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
-                YAxis rightAxis = chart.getAxisRight();
-                rightAxis.setDrawGridLines(false);
-                rightAxis.setLabelCount(8, false);
-                rightAxis.setValueFormatter(custom);
-                rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+                    YAxis rightAxis = chart.getAxisRight();
+                    rightAxis.setDrawGridLines(false);
+                    rightAxis.setLabelCount(8, false);
+                    rightAxis.setValueFormatter(custom);
+                    rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
-                Legend l = chart.getLegend();
-                l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-                l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
-                l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-                l.setDrawInside(false);
-                l.setForm(Legend.LegendForm.SQUARE);
-                l.setFormSize(9f);
-                l.setTextSize(11f);
-                l.setXEntrySpace(4f);
+                    Legend l = chart.getLegend();
+                    l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+                    l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+                    l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+                    l.setDrawInside(false);
+                    l.setForm(Legend.LegendForm.SQUARE);
+                    l.setFormSize(9f);
+                    l.setTextSize(11f);
+                    l.setXEntrySpace(4f);
 
-                BarDataSet dataSet = new BarDataSet(weekData, "Sleeping Time");
-                BarData data = new BarData(dataSet);
-                chart.setData(data);
-                chart.invalidate();
+                    BarDataSet dataSet = new BarDataSet(weekData, "Sleeping Time");
+                    BarData data = new BarData(dataSet);
+                    chart.setData(data);
+                    chart.invalidate();
+                }
+                else {
+                    Toast.makeText(getContext(), "You don't have any data to analyze", Toast.LENGTH_SHORT).show();
+                }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -232,6 +244,7 @@ public class SleepAnalysisFragment extends Fragment {
         myRef.child(currentYear).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean dataExists = false;
                 float hour;
                 float minute;
                 float hourAndMinuteValue;
@@ -244,78 +257,87 @@ public class SleepAnalysisFragment extends Fragment {
                         totalTimeInMillis += date.getValue(long.class);
                         alarmCounts += 1;
                     }
-                    averageTimeInMillis = totalTimeInMillis / alarmCounts;
-                    minute = averageTimeInMillis / (1000 * 60) % 60;
-                    hour =averageTimeInMillis / (1000 * 60 * 60) % 24;
-                    hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
+                    if (alarmCounts != 0){
+                        averageTimeInMillis = totalTimeInMillis / alarmCounts;
+                        minute = averageTimeInMillis / (1000 * 60) % 60;
+                        hour =averageTimeInMillis / (1000 * 60 * 60) % 24;
+                        hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
 
-                    yearData.add(new BarEntry(Integer.valueOf(month.getKey()), hourAndMinuteValue));
+                        yearData.add(new BarEntry(Integer.valueOf(month.getKey()), hourAndMinuteValue));
+                        dataExists = true;
+                    }
                 }
 
-                // programmatically create a LineChart and set size
-                BarChart chart = new BarChart(getContext());
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                );
+                if (dataExists) {
+                    // programmatically create a LineChart and set size
+                    BarChart chart = new BarChart(getContext());
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                            RelativeLayout.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT
+                    );
 
-                chart.setLayoutParams(params);
+                    chart.setLayoutParams(params);
 
-                parentLayout.addView(chart); // add the programmatically created chart
+                    parentLayout.addView(chart); // add the programmatically created chart
 
-                chart.setDrawBarShadow(false);
-                chart.setDrawValueAboveBar(true);
+                    chart.setDrawBarShadow(false);
+                    chart.setDrawValueAboveBar(true);
 
-                chart.getDescription().setEnabled(false);
+                    chart.getDescription().setEnabled(false);
 
-                // if more than 31 entries are displayed in the chart, no values will be
-                // drawn
-                chart.setMaxVisibleValueCount(31);
+                    // if more than 31 entries are displayed in the chart, no values will be
+                    // drawn
+                    chart.setMaxVisibleValueCount(31);
 
-                // scaling can now only be done on x- and y-axis separately
-                chart.setPinchZoom(false);
+                    // scaling can now only be done on x- and y-axis separately
+                    chart.setPinchZoom(false);
 
-                chart.setDrawGridBackground(false);
-                // mChart.setDrawYLabels(false);
+                    chart.setDrawGridBackground(false);
+                    // mChart.setDrawYLabels(false);
 
-                IAxisValueFormatter xAxisFormatter = new MonthAxisValueFormatter(chart);
+                    IAxisValueFormatter xAxisFormatter = new MonthAxisValueFormatter(chart);
 
-                XAxis xAxis = chart.getXAxis();
-                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-                xAxis.setDrawGridLines(false);
-                xAxis.setGranularity(1f); // only intervals of 1 day
-                xAxis.setLabelCount(12);
+                    XAxis xAxis = chart.getXAxis();
+                    xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                    xAxis.setDrawGridLines(false);
+                    xAxis.setGranularity(1f); // only intervals of 1 day
+                    xAxis.setLabelCount(12);
 //                xAxis.setCenterAxisLabels(true);
-                xAxis.setValueFormatter(xAxisFormatter);
+                    xAxis.setValueFormatter(xAxisFormatter);
 
-                IAxisValueFormatter custom = new YAxisValueFormatter();
+                    IAxisValueFormatter custom = new YAxisValueFormatter();
 
-                YAxis leftAxis = chart.getAxisLeft();
-                leftAxis.setLabelCount(8, false);
-                leftAxis.setValueFormatter(custom);
-                leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-                leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(false)
+                    YAxis leftAxis = chart.getAxisLeft();
+                    leftAxis.setLabelCount(8, false);
+                    leftAxis.setValueFormatter(custom);
+                    leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+                    leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(false)
 
-                YAxis rightAxis = chart.getAxisRight();
-                rightAxis.setDrawGridLines(false);
-                rightAxis.setLabelCount(8, false);
-                rightAxis.setValueFormatter(custom);
-                rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(false)
+                    YAxis rightAxis = chart.getAxisRight();
+                    rightAxis.setDrawGridLines(false);
+                    rightAxis.setLabelCount(8, false);
+                    rightAxis.setValueFormatter(custom);
+                    rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(false)
 
-                Legend l = chart.getLegend();
-                l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-                l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
-                l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-                l.setDrawInside(false);
-                l.setForm(Legend.LegendForm.SQUARE);
-                l.setFormSize(9f);
-                l.setTextSize(11f);
-                l.setXEntrySpace(4f);
+                    Legend l = chart.getLegend();
+                    l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+                    l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+                    l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+                    l.setDrawInside(false);
+                    l.setForm(Legend.LegendForm.SQUARE);
+                    l.setFormSize(9f);
+                    l.setTextSize(11f);
+                    l.setXEntrySpace(4f);
 
-                BarDataSet dataSet = new BarDataSet(yearData, "Sleeping Time");
-                BarData data = new BarData(dataSet);
-                chart.setData(data);
-                chart.invalidate();
+                    BarDataSet dataSet = new BarDataSet(yearData, "Sleeping Time");
+                    BarData data = new BarData(dataSet);
+                    chart.setData(data);
+                    chart.invalidate();
+                }
+
+                else {
+                    Toast.makeText(getContext(), "You don't have any data to analyze", Toast.LENGTH_SHORT).show();
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -329,88 +351,96 @@ public class SleepAnalysisFragment extends Fragment {
         myRef.child(currentYear).child(currentMonth).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean dataExist = false;
                 float hour;
                 float minute;
                 float hourAndMinuteValue;
                 List<Entry> monthData = new ArrayList<>();
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    if (data.getValue() != null){
+                        dataExist = true;
 
-                    minute = Math.round(data.getValue(long.class) / (1000 * 60) % 60);
-                    hour = Math.round(data.getValue(long.class) / (1000 * 60 * 60) % 24);
-                    hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
+                        minute = Math.round(data.getValue(long.class) / (1000 * 60) % 60);
+                        hour = Math.round(data.getValue(long.class) / (1000 * 60 * 60) % 24);
+                        hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
 
-                    monthData.add(new Entry(Integer.valueOf(data.getKey()), hourAndMinuteValue));
+                        monthData.add(new Entry(Integer.valueOf(data.getKey()), hourAndMinuteValue));
+                    }
                 }
 
-                // programmatically create a LineChart and set size
-                LineChart chart = new LineChart(getContext());
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                );
+                if (dataExist){
+                    // programmatically create a LineChart and set size
+                    LineChart chart = new LineChart(getContext());
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                            RelativeLayout.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT
+                    );
 
 
 
-                LineDataSet dataSet = new LineDataSet(monthData, "Sleeping Time");
-                dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-                dataSet.setCubicIntensity(0.2f);
-                dataSet.setDrawFilled(true);
-                dataSet.setDrawCircles(false);
-                dataSet.setLineWidth(1.8f);
-                dataSet.setCircleRadius(4f);
-                dataSet.setCircleColor(android.R.color.white);
-                dataSet.setHighLightColor(Color.GRAY);
-                dataSet.setColor(Color.GRAY);
-                dataSet.setFillColor(Color.GRAY);
-                dataSet.setFillAlpha(100);
-                dataSet.setDrawHorizontalHighlightIndicator(false);
+                    LineDataSet dataSet = new LineDataSet(monthData, "Sleeping Time");
+                    dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+                    dataSet.setCubicIntensity(0.2f);
+                    dataSet.setDrawFilled(true);
+                    dataSet.setDrawCircles(false);
+                    dataSet.setLineWidth(1.8f);
+                    dataSet.setCircleRadius(4f);
+                    dataSet.setCircleColor(android.R.color.white);
+                    dataSet.setHighLightColor(Color.GRAY);
+                    dataSet.setColor(Color.GRAY);
+                    dataSet.setFillColor(Color.GRAY);
+                    dataSet.setFillAlpha(100);
+                    dataSet.setDrawHorizontalHighlightIndicator(false);
 
-                lineData = new LineData(dataSet);
+                    lineData = new LineData(dataSet);
 
-                chart.setLayoutParams(params);
-                parentLayout.addView(chart); // add the programmatically created chart
+                    chart.setLayoutParams(params);
+                    parentLayout.addView(chart); // add the programmatically created chart
 
 
-                IAxisValueFormatter xAxisFormatter = new DateAxisValueFormatter(chart);
+                    IAxisValueFormatter xAxisFormatter = new DateAxisValueFormatter(chart);
 
-                XAxis xAxis = chart.getXAxis();
-                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-                xAxis.setDrawGridLines(false);
-                xAxis.setGranularity(1f); // only intervals of 1 day
-                xAxis.setCenterAxisLabels(true);
-                xAxis.setValueFormatter(xAxisFormatter);
+                    XAxis xAxis = chart.getXAxis();
+                    xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                    xAxis.setDrawGridLines(false);
+                    xAxis.setGranularity(1f); // only intervals of 1 day
+                    xAxis.setCenterAxisLabels(true);
+                    xAxis.setValueFormatter(xAxisFormatter);
 
-                IAxisValueFormatter custom = new YAxisValueFormatter();
+                    IAxisValueFormatter custom = new YAxisValueFormatter();
 
-                YAxis leftAxis = chart.getAxisLeft();
-                leftAxis.setLabelCount(8, false);
-                leftAxis.setValueFormatter(custom);
-                leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-                leftAxis.setAxisMinimum(0f);
+                    YAxis leftAxis = chart.getAxisLeft();
+                    leftAxis.setLabelCount(8, false);
+                    leftAxis.setValueFormatter(custom);
+                    leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+                    leftAxis.setAxisMinimum(0f);
 
-                YAxis rightAxis = chart.getAxisRight();
-                rightAxis.setDrawGridLines(false);
-                rightAxis.setLabelCount(8, false);
-                rightAxis.setValueFormatter(custom);
-                rightAxis.setAxisMinimum(0f);
+                    YAxis rightAxis = chart.getAxisRight();
+                    rightAxis.setDrawGridLines(false);
+                    rightAxis.setLabelCount(8, false);
+                    rightAxis.setValueFormatter(custom);
+                    rightAxis.setAxisMinimum(0f);
 
-                Legend l = chart.getLegend();
-                l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-                l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
-                l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-                l.setDrawInside(false);
-                l.setForm(Legend.LegendForm.SQUARE);
-                l.setFormSize(9f);
-                l.setTextSize(11f);
-                l.setXEntrySpace(4f);
+                    Legend l = chart.getLegend();
+                    l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+                    l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+                    l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+                    l.setDrawInside(false);
+                    l.setForm(Legend.LegendForm.SQUARE);
+                    l.setFormSize(9f);
+                    l.setTextSize(11f);
+                    l.setXEntrySpace(4f);
 
-                // scaling can now only be done on x- and y-axis separately
-                chart.setPinchZoom(false);
-                chart.setDrawGridBackground(false);
-                // chart.setDrawYLabels(false);
-                chart.setData(lineData);
-                chart.getXAxis().setDrawGridLines(false);
-                chart.invalidate(); // refresh
+                    // scaling can now only be done on x- and y-axis separately
+                    chart.setPinchZoom(false);
+                    chart.setDrawGridBackground(false);
+                    // chart.setDrawYLabels(false);
+                    chart.setData(lineData);
+                    chart.getXAxis().setDrawGridLines(false);
+                    chart.invalidate(); // refresh
+                } else {
+                    Toast.makeText(getContext(), "You don't have any data to analyze", Toast.LENGTH_SHORT).show();
+                }
 
             }
             @Override

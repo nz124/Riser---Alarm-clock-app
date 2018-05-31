@@ -14,12 +14,14 @@
         <activity android:name=".MainActivity"
                  android:label="@string/app_name">
             <intent-filter>
-                <data android:scheme="@string/fb_login_protocol_scheme" />
-                <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.VIEW"/>
-                <action android:name="OPEN_ACTIVITY_1" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+                <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
         <activity android:name=".SignInActivity"/>

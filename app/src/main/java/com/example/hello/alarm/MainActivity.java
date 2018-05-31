@@ -39,6 +39,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,19 +125,20 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
+        // Check if user is signed in (non-null) and update UI accordingly.
+        currentUser = mAuth.getCurrentUser();
         //Sign user in anonymously
         if (currentUser == null) {
             loginAsGuest();
+            Log.e("hey", "onCreate: "+ FirebaseInstanceId.getInstance().getToken());
         }
         else {
             //Listen for changes from database and update UI
             updateUI(currentUser);
             //Convert guest account to Facebook/Google account if possible
             linkAccount();
+            Log.e("hey", "onCreate: "+ FirebaseInstanceId.getInstance().getToken());
         }
-
-        // Check if user is signed in (non-null) and update UI accordingly.
-        currentUser = mAuth.getCurrentUser();
 
         //Determine to increment or decrement point based on the extras being passed in
         String action_type = getIntent().getStringExtra("type");
@@ -393,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
         database.child(currentUser.getUid()).removeEventListener(eventListener);
     }
 
-    private void pushNotification() {
+    private void pushNotification(final String point) {
         database.child(currentUser.getUid()).child("FCM Token").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -402,8 +404,8 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject jNotification = new JSONObject();
                 JSONObject jData = new JSONObject();
                 try {
-                    jNotification.put("title", "Google I/O 2016");
-                    jNotification.put("body", "Firebase Cloud Messaging (App)");
+                    jNotification.put("title", "You are challenged");
+                    jNotification.put("body", "Someone challenged you for " + point);
                     jNotification.put("sound", "default");
                     jNotification.put("badge", "1");
                     jNotification.put("click_action", "OPEN_ACTIVITY_1");
