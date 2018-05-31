@@ -21,12 +21,12 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService{
         // Instance ID token to your app server.
 //        sendRegistrationToServer(refreshedToken);
     }
-
-    public void sendRegistrationToServer(String refreshedToken){
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null){
-            DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("FCM Token");
-            myRef.setValue(refreshedToken);
-        }
-    }
+//
+//    public void sendRegistrationToServer(String refreshedToken){
+//        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+//        if (currentUser != null){
+//            DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("FCM Token");
+//            myRef.setValue(refreshedToken);
+//        }
+//    }
 }

@@ -82,6 +82,11 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     AuthCredential credential;
 
+    //Prepare viewpager and add circle indicator for view pager
+    ViewPager viewPager;
+
+    CircleIndicator indicator;
+
     boolean sleepAnalysisFragment = false;
 
     public static Intent createIntent(Context context, IdpResponse idpResponse) {
@@ -102,6 +107,11 @@ public class MainActivity extends AppCompatActivity {
 
         this.context = this;
 
+        viewPager = findViewById(R.id.viewpager);
+        indicator = findViewById(R.id.indicator);
+
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+
         navigationView = findViewById(R.id.nav_view);
         header_view = navigationView.getHeaderView(0);
         nav_point = header_view.findViewById(R.id.nav_point);
@@ -112,8 +122,19 @@ public class MainActivity extends AppCompatActivity {
 
         //Access database and reference to the data of the current's user
         database = FirebaseDatabase.getInstance().getReference();
-
         mAuth = FirebaseAuth.getInstance();
+
+        //Sign user in anonymously
+        if (currentUser == null) {
+            loginAsGuest();
+        }
+        else {
+            //Listen for changes from database and update UI
+            updateUI(currentUser);
+            //Convert guest account to Facebook/Google account if possible
+            linkAccount();
+        }
+
         // Check if user is signed in (non-null) and update UI accordingly.
         currentUser = mAuth.getCurrentUser();
 
@@ -132,71 +153,11 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
         }
 
-        //Sign user in anonymously
-        if (currentUser == null) {
-            loginAsGuest();
-        }
-        else {
-            //Listen for changes from database and update UI
-            updateUI(currentUser);
-            //Convert guest account to Facebook/Google account if possible
-            linkAccount();
-        }
-
-        //Prepare viewpager and add circle indicator for view pager
-        final ViewPager viewPager = findViewById(R.id.viewpager);
-
-        final CircleIndicator indicator = findViewById(R.id.indicator);
-
-        //Show fragments and functions properly depending on user's purchased items
-        database.child(currentUser.getUid()).child("Items").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child("Sleep Tracker").getValue() != null){
-                    sleepAnalysisFragment = true;
-                }
-                Log.e("TRUE OR FALSE", "onDataChange: " + dataSnapshot.child("Sleep Tracker"));
-                setupViewPager(viewPager, sleepAnalysisFragment);
-                indicator.setViewPager(viewPager);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
         //Configure action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-
-        mDrawerLayout = findViewById(R.id.drawer_layout);
-        //Handle navigation click events
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // set item as selected to persist highlight
-                        menuItem.setChecked(true);
-                        // close drawer when item is tapped
-                        mDrawerLayout.closeDrawers();
-                        switch(menuItem.getItemId()) {
-                            case R.id.nav_sign_in:
-                                startActivity(SignInActivity.createIntent(context));
-                                break;
-                            case R.id.nav_sign_out:
-                                mAuth.signOut();
-                                Toast.makeText(context, "Sign out succesfully", Toast.LENGTH_LONG).show();
-                                loginAsGuest();
-                                updateUI(currentUser);
-                        }
-                        // Add code here to update the UI based on the item selected
-                        // For example, swap UI fragments here
-                        return true;
-                    }
-                });
 
     }
 
@@ -357,9 +318,52 @@ public class MainActivity extends AppCompatActivity {
             nav_sign_out.setVisible(true);
         }
 
-        myRef = database.child(user.getUid());
+        //Handle navigation click events on the side bar
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+                        switch(menuItem.getItemId()) {
+                            case R.id.nav_sign_in:
+                                startActivity(SignInActivity.createIntent(context));
+                                break;
+                            case R.id.nav_sign_out:
+                                mAuth.signOut();
+                                Toast.makeText(context, "Sign out succesfully", Toast.LENGTH_LONG).show();
+                                loginAsGuest();
+                                updateUI(currentUser);
+                        }
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+                        return true;
+                    }
+                });
+
+
+        //Show fragments and functions properly depending on user's purchased items
+        database.child(currentUser.getUid()).child("Items").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child("Sleep Tracker").getValue() != null){
+                    sleepAnalysisFragment = true;
+                }
+                Log.e("TRUE OR FALSE", "onDataChange: " + dataSnapshot.child("Sleep Tracker"));
+                setupViewPager(viewPager, sleepAnalysisFragment);
+                indicator.setViewPager(viewPager);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         //Update user information from Database
-        eventListener = myRef.addValueEventListener(new ValueEventListener() {
+        eventListener = database.child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot data) {
                 User user = data.getValue(User.class);
@@ -387,6 +391,67 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         database.child(currentUser.getUid()).removeEventListener(eventListener);
+    }
+
+    private void pushNotification() {
+        database.child(currentUser.getUid()).child("FCM Token").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String AUTH_TOKEN = dataSnapshot.getValue(String.class);
+                JSONObject jPayload = new JSONObject();
+                JSONObject jNotification = new JSONObject();
+                JSONObject jData = new JSONObject();
+                try {
+                    jNotification.put("title", "Google I/O 2016");
+                    jNotification.put("body", "Firebase Cloud Messaging (App)");
+                    jNotification.put("sound", "default");
+                    jNotification.put("badge", "1");
+                    jNotification.put("click_action", "OPEN_ACTIVITY_1");
+                    jNotification.put("icon", "ic_notification");
+
+                    jData.put("picture", "http://opsbug.com/static/google-io.jpg");
+
+                    JSONArray ja = new JSONArray();
+                    ja.put(AUTH_TOKEN);
+                    jPayload.put("registration_ids", ja);
+
+
+                    jPayload.put("priority", "high");
+                    jPayload.put("notification", jNotification);
+                    jPayload.put("data", jData);
+
+                    URL url = new URL("https://fcm.googleapis.com/fcm/send");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Authorization", "AUTH-KEY");
+                    conn.setRequestProperty("Content-Type", "application/json");
+                    conn.setDoOutput(true);
+
+                    // Send FCM message content.
+                    OutputStream outputStream = conn.getOutputStream();
+                    outputStream.write(jPayload.toString().getBytes());
+
+//            // Read FCM response.
+//            InputStream inputStream = conn.getInputStream();
+//            final String resp = convertStreamToString(inputStream);
+
+//            Handler h = new Handler(Looper.getMainLooper());
+//            h.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mTextView.setText(resp);
+//                }
+//            });
+                } catch (JSONException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
