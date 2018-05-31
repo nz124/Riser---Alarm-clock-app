@@ -1,5 +1,6 @@
 package com.example.hello.alarm;
 
+import android.app.Fragment;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -187,13 +188,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setupViewPager(ViewPager viewPager, boolean sleepAnalysis) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("sleep_analysis", sleepAnalysis);
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new AlarmListFragment(), "ONE");
         adapter.addFragment(new FriendListFragment(), "TWO");
         if (sleepAnalysis){
             adapter.addFragment(new SleepAnalysisFragment(), "THREE");
         }
-        adapter.addFragment(new StoreFragment(), "FOUR");
+        //Show items on the store based on what items the user already has
+        StoreFragment storeFragment = new StoreFragment();
+        storeFragment.setArguments(bundle);
+
+        adapter.addFragment(storeFragment, "FOUR");
         viewPager.setAdapter(adapter);
     }
 

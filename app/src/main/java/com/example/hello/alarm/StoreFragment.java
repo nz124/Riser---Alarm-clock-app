@@ -27,6 +27,8 @@ public class StoreFragment extends Fragment {
     private RecyclerView.LayoutManager mStaggeredGridLayoutManager;
     private ArrayList<StoreItem> storeList;
 
+    boolean sleepAnalysisIsOwned = false;
+
 
     public StoreFragment() {
         // Required empty public constructor
@@ -37,10 +39,10 @@ public class StoreFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
 
-
+        sleepAnalysisIsOwned = getArguments().getBoolean("sleep_analysis");
         //Initialize store list
         storeList = new ArrayList<>();
-        storeList.add(new StoreItem(R.drawable.ic_sleeptracker, "Sleep Tracker", "Get access to analytical data that tracks and improve your sleep", 500));
+        storeList.add(new StoreItem(R.drawable.ic_sleeptracker, "Sleep Tracker", "Get access to analytical data that tracks and improve your sleep", 500, sleepAnalysisIsOwned));
     }
 
     @Override
@@ -75,7 +77,6 @@ public class StoreFragment extends Fragment {
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class ViewHolder extends RecyclerView.ViewHolder {
-            // each data item is just a string in this case
             public ImageView itemImage;
             public TextView itemTitle;
             public TextView itemPrice;
@@ -124,6 +125,12 @@ public class StoreFragment extends Fragment {
             holder.itemTitle.setText(storeList.get(position).title);
             holder.itemPrice.setText(String.valueOf(storeList.get(position).price));
             holder.itemDescription.setText(storeList.get(position).description);
+
+            //Check if item is owned
+            if (storeList.get(position).isOwned){
+                holder.itemPurchaseButton.setText("Activated");
+                holder.itemPurchaseButton.setEnabled(false);
+            }
             holder.itemPurchaseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
