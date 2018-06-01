@@ -4,7 +4,7 @@ import java.util.List;
 
 public class User {
     public String name;
-    public String fcm_token;
+    public String user_id;
     public String photoUriString;
     public int point;
     public List<Alarm> alarms;
@@ -13,11 +13,10 @@ public class User {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String name, String photoUriString, int point, String fcm_token){
+    public User(String name, String photoUriString, int point, String user_id){
         this.name = name;
         this.photoUriString = photoUriString;
         this.point = point;
-        this.fcm_token = fcm_token;
     }
 
     public List<Alarm> getAlarms() {
