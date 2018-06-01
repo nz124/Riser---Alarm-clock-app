@@ -1,5 +1,6 @@
 package com.example.hello.alarm;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -174,6 +176,7 @@ public class FriendListFragment extends Fragment {
             holder.challengeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    showPointPicker(getContext());
                     Toast.makeText(getContext(), friendList.get(position).name, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -190,6 +193,43 @@ public class FriendListFragment extends Fragment {
         public int getItemCount() {
             return friendList.size();
         }
+    }
+
+    public void showPointPicker(Context context) {
+
+        final Dialog d = new Dialog(context);
+        d.setTitle("How many point do you want to use for this challenge?");
+        d.setContentView(R.layout.point_picker_dialog);
+        Button challengeButton = d.findViewById(R.id.confirm_button);
+        Button cancelButton = d.findViewById(R.id.cancel_button);
+        final TextView pointDisplay = d.findViewById(R.id.pointTextView);
+        final NumberPicker np = d.findViewById(R.id.number_picker);
+
+        np.setMaxValue(100); // max value 100
+        np.setMinValue(0);   // min value 0
+        np.setWrapSelectorWheel(false);
+        np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                picker.setValue( (newVal < oldVal) ? oldVal-5 : oldVal+5);
+            }
+        });
+        challengeButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                pointDisplay.setText(String.valueOf(np.getValue())); //set the value to textview
+                d.dismiss();
+            }
+        });
+        cancelButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                d.dismiss(); // dismiss the dialog
+            }
+        });
+        d.show();
     }
 
     @Override

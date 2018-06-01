@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="300dp">
+
+    <NumberPicker
+        android:id="@+id/number_picker"
+        android:layout_width="match_parent"
+        android:layout_height="147dp"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/pointTextView" />
+
+    <Button
+        android:id="@+id/confirm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="27dp"
+        android:layout_marginStart="63dp"
+        android:text="Challenge"
+        tools:layout_editor_absoluteX="73dp"
+        tools:layout_editor_absoluteY="500dp" />
+
+    <Button
+        android:id="@+id/cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/confirm_button"
+        android:layout_marginEnd="97dp"
+        android:text="Cancel"
+        tools:layout_editor_absoluteX="227dp"
+        tools:layout_editor_absoluteY="500dp" />
+
+    <TextView
+        android:id="@+id/pointTextView"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_alignEnd="@+id/confirm_button"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="-244dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="How many point do you want to spend for this challenge?" />
+</RelativeLayout>

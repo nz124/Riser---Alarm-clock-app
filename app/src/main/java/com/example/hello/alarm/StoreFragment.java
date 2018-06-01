@@ -134,28 +134,30 @@ public class StoreFragment extends Fragment {
             }
             //Get database reference to user's item list
             currentUser = FirebaseAuth.getInstance().getCurrentUser();
-            myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Items");
-            holder.itemPurchaseButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String item = "";
-                    switch (holder.itemTitle.getText().toString()) {
-                        case ("Sleep Tracker"):
-                            item = "Sleep Tracker";
-                            break;
-                        case ("Challenge Friends"):
-                            item = "Challenge Friends";
-                            break;
+            if (currentUser != null){
+                myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Items");
+                holder.itemPurchaseButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String item = "";
+                        switch (holder.itemTitle.getText().toString()) {
+                            case ("Sleep Tracker"):
+                                item = "Sleep Tracker";
+                                break;
+                            case ("Social Feature"):
+                                item = "Social Feature";
+                                break;
+                        }
+                        //Update item on the database
+                        myRef.child(item).setValue(true);
+                        Toast.makeText(getContext(), "You have successfully unlocked "+ item, Toast.LENGTH_SHORT).show();
+                        MainActivity.incrementPointAndSaveToDb(getContext(), currentUser, false, storeList.get(position).price);
+                        //Restart application
+                        getActivity().finish();
+                        MainActivity.restartActivity(getContext());
                     }
-                    //Update item on the database
-                    myRef.child(item).setValue(true);
-                    Toast.makeText(getContext(), "You have successfully unlocked "+ item, Toast.LENGTH_SHORT).show();
-                    MainActivity.incrementPointAndSaveToDb(getContext(), currentUser, false, storeList.get(position).price);
-                    //Restart application
-                    getActivity().finish();
-                    MainActivity.restartActivity(getContext());
-                }
-            });
+                });
+            }
         }
 
         // Return the size of your dataset (invoked by the layout manager)

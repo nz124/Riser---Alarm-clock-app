@@ -17,6 +17,7 @@ public class User {
         this.name = name;
         this.photoUriString = photoUriString;
         this.point = point;
+        this.user_id = user_id;
     }
 
     public List<Alarm> getAlarms() {
