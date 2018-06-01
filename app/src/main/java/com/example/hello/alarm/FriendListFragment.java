@@ -37,9 +37,6 @@ import java.util.ArrayList;
 
 public class FriendListFragment extends Fragment {
 
-    AccessToken currentUserToken;
-    String currentUserId;
-    String currentUserTokenString;
     DatabaseReference myRef;
     ValueEventListener eventListener;
 
@@ -52,11 +49,6 @@ public class FriendListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        currentUserToken = AccessToken.getCurrentAccessToken();
-        if (currentUserToken != null){
-            currentUserId = currentUserToken.getUserId();
-        currentUserTokenString = currentUserToken.getToken();
-        }
 
         myRef = FirebaseDatabase.getInstance().getReference();
     }
@@ -196,7 +188,6 @@ public class FriendListFragment extends Fragment {
     }
 
     public void showPointPicker(Context context) {
-
         final Dialog d = new Dialog(context);
         d.setTitle("How many point do you want to use for this challenge?");
         d.setContentView(R.layout.point_picker_dialog);
@@ -204,14 +195,27 @@ public class FriendListFragment extends Fragment {
         Button cancelButton = d.findViewById(R.id.cancel_button);
         final TextView pointDisplay = d.findViewById(R.id.pointTextView);
         final NumberPicker np = d.findViewById(R.id.number_picker);
+        myRef.child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User currentUser = dataSnapshot.getValue(User.class);
+                int userPoint = currentUser.point;
+                np.setMinValue(0);   // min value 0
+                np.setMaxValue(userPoint); // max value == user's point
+            }
 
-        np.setMaxValue(100); // max value 100
-        np.setMinValue(0);   // min value 0
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         np.setWrapSelectorWheel(false);
         np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                picker.setValue( (newVal < oldVal) ? oldVal-5 : oldVal+5);
+                picker.setValue( (newVal < oldVal) ? oldVal-100 : oldVal+100);
             }
         });
         challengeButton.setOnClickListener(new View.OnClickListener()
