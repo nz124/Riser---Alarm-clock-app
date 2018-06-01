@@ -66,28 +66,33 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="StoreFragment.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="StoreFragment.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/StoreFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="971">
-              <caret line="104" column="50" lean-forward="false" selection-start-line="104" selection-start-column="50" selection-end-line="104" selection-end-column="50" />
-              <folding />
+            <state relative-caret-position="334">
+              <caret line="46" column="84" lean-forward="false" selection-start-line="46" selection-start-column="84" selection-end-line="46" selection-end-column="84" />
+              <folding>
+                <element signature="e#5647#6683#0" expanded="true" />
+                <element signature="e#6682#6683#0" expanded="true" />
+                <element signature="e#6824#6825#0" expanded="true" />
+                <element signature="e#6871#6872#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FriendListFragment.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="FriendListFragment.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/FriendListFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="144" column="67" lean-forward="false" selection-start-line="144" selection-start-column="67" selection-end-line="144" selection-end-column="67" />
+            <state relative-caret-position="97">
+              <caret line="75" column="136" lean-forward="false" selection-start-line="75" selection-start-column="136" selection-end-line="75" selection-end-column="136" />
               <folding>
                 <element signature="e#14997#14998#0" expanded="true" />
                 <element signature="e#15049#15050#0" expanded="true" />
-                <element signature="e#16229#16469#0" expanded="true" />
-                <element signature="e#16468#16469#0" expanded="true" />
-                <element signature="e#16847#16848#0" expanded="true" />
-                <element signature="e#16895#16896#0" expanded="true" />
+                <element signature="e#16293#16533#0" expanded="true" />
+                <element signature="e#16532#16533#0" expanded="true" />
+                <element signature="e#16911#16912#0" expanded="true" />
+                <element signature="e#16959#16960#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -2270,9 +2275,9 @@
         <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/friend_list_fragment_layout.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/SleepAnalysisFragment.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/StoreFragment.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/friend_list_item.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/FriendListFragment.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/StoreFragment.java" />
       </list>
     </option>
   </component>
@@ -2995,25 +3000,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/StoreFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="971">
-          <caret line="104" column="50" lean-forward="false" selection-start-line="104" selection-start-column="50" selection-end-line="104" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/FriendListFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="144" column="67" lean-forward="false" selection-start-line="144" selection-start-column="67" selection-end-line="144" selection-end-column="67" />
+        <state relative-caret-position="97">
+          <caret line="75" column="136" lean-forward="false" selection-start-line="75" selection-start-column="136" selection-end-line="75" selection-end-column="136" />
           <folding>
             <element signature="e#14997#14998#0" expanded="true" />
             <element signature="e#15049#15050#0" expanded="true" />
-            <element signature="e#16229#16469#0" expanded="true" />
-            <element signature="e#16468#16469#0" expanded="true" />
-            <element signature="e#16847#16848#0" expanded="true" />
-            <element signature="e#16895#16896#0" expanded="true" />
+            <element signature="e#16293#16533#0" expanded="true" />
+            <element signature="e#16532#16533#0" expanded="true" />
+            <element signature="e#16911#16912#0" expanded="true" />
+            <element signature="e#16959#16960#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/example/hello/alarm/StoreFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="334">
+          <caret line="46" column="84" lean-forward="false" selection-start-line="46" selection-start-column="84" selection-end-line="46" selection-end-column="84" />
+          <folding>
+            <element signature="e#5647#6683#0" expanded="true" />
+            <element signature="e#6682#6683#0" expanded="true" />
+            <element signature="e#6824#6825#0" expanded="true" />
+            <element signature="e#6871#6872#0" expanded="true" />
           </folding>
         </state>
       </provider>

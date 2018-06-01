@@ -44,6 +44,7 @@ public class StoreFragment extends Fragment {
         //Initialize store list
         storeList = new ArrayList<>();
         storeList.add(new StoreItem(R.drawable.ic_sleeptracker, "Sleep Tracker", "Get access to analytical data that tracks and improve your sleep", 500, sleepAnalysisIsOwned));
+        storeList.add(new StoreItem(R.drawable.ic_challenge_icon, "Challenge Friends", "Challenge your friend and win point. Wake up early and be the winner", 500, false));
     }
 
     @Override
@@ -134,18 +135,22 @@ public class StoreFragment extends Fragment {
             holder.itemPurchaseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String item = null;
-                    switch (holder.itemTitle.getText().toString()){
+                    String item = "";
+                    switch (holder.itemTitle.getText().toString()) {
                         case ("Sleep Tracker"):
                             item = "Sleep Tracker";
-                            //Update item on the database
-                            myRef.child(item).setValue(true);
-                            Toast.makeText(getContext(), "You have successfully unlocked Sleep Tracker", Toast.LENGTH_SHORT).show();
-                            MainActivity.incrementPointAndSaveToDb(getContext(), currentUser, false, storeList.get(position).price);
-                            //Restart application
-                            getActivity().finish();
-                            MainActivity.restartActivity(getContext());
+                            break;
+                        case ("Challenge Friends"):
+                            item = "Challenge Friends";
+                            break;
                     }
+                    //Update item on the database
+                    myRef.child(item).setValue(true);
+                    Toast.makeText(getContext(), "You have successfully unlocked "+ item, Toast.LENGTH_SHORT).show();
+                    MainActivity.incrementPointAndSaveToDb(getContext(), currentUser, false, storeList.get(position).price);
+                    //Restart application
+                    getActivity().finish();
+                    MainActivity.restartActivity(getContext());
                 }
             });
         }

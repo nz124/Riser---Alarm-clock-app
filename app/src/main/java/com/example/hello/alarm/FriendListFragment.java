@@ -149,6 +149,7 @@ public class FriendListFragment extends Fragment {
 
             holder.userName.setText(friendList.get(position).name);
             holder.userPoint.setText("Point: "+String.valueOf(friendList.get(position).point));
+            holder.challengeButton.setVisibility(View.VISIBLE);
             holder.challengeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
