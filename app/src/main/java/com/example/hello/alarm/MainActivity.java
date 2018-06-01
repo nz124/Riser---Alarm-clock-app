@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     CircleIndicator indicator;
 
     boolean sleepAnalysisFragment = false;
+    boolean friendFragment = false;
 
     public static Intent createIntent(Context context, IdpResponse idpResponse) {
         return new Intent().setClass(context, MainActivity.class)
@@ -161,12 +162,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void setupViewPager(ViewPager viewPager, boolean sleepAnalysis) {
+    public void setupViewPager(ViewPager viewPager, boolean sleepAnalysis, boolean challenge_friend) {
         Bundle bundle = new Bundle();
         bundle.putBoolean("sleep_analysis", sleepAnalysis);
+        bundle.putBoolean("challenge_friend", challenge_friend);
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new AlarmListFragment(), "ONE");
-        adapter.addFragment(new FriendListFragment(), "TWO");
+        if (challenge_friend){
+            adapter.addFragment(new FriendListFragment(), "TWO");
+        }
         if (sleepAnalysis){
             adapter.addFragment(new SleepAnalysisFragment(), "THREE");
         }
@@ -353,9 +358,12 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child("Sleep Tracker").getValue() != null){
                     sleepAnalysisFragment = true;
+                };
+                if (dataSnapshot.child("Challenge Friends").getValue() != null) {
+                    friendFragment = true;
                 }
                 Log.e("TRUE OR FALSE", "onDataChange: " + dataSnapshot.child("Sleep Tracker"));
-                setupViewPager(viewPager, sleepAnalysisFragment);
+                setupViewPager(viewPager, sleepAnalysisFragment, friendFragment);
                 indicator.setViewPager(viewPager);
             }
 

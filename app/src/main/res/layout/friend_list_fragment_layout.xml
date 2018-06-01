@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/parentView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.hello.alarm.FriendListFragment">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/parentView"
+        android:layout_width="match_parent"
+        android:layout_height="544dp" />
+
+    <RadioGroup
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/parentView"
+        android:layout_marginStart="84dp"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <RadioButton
+            android:id="@+id/show_friend_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Friends" />
+
+        <RadioButton
+            android:id="@+id/show_challenge_history_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Challenges" />
+    </RadioGroup>
 
 </RelativeLayout>

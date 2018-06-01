@@ -29,6 +29,7 @@ public class StoreFragment extends Fragment {
     private ArrayList<StoreItem> storeList;
 
     boolean sleepAnalysisIsOwned = false;
+    boolean challenge_friend = false;
 
 
     public StoreFragment() {
@@ -41,10 +42,12 @@ public class StoreFragment extends Fragment {
 
 
         sleepAnalysisIsOwned = getArguments().getBoolean("sleep_analysis");
+        challenge_friend = getArguments().getBoolean("challenge_friend");
+
         //Initialize store list
         storeList = new ArrayList<>();
         storeList.add(new StoreItem(R.drawable.ic_sleeptracker, "Sleep Tracker", "Get access to analytical data that tracks and improve your sleep", 500, sleepAnalysisIsOwned));
-        storeList.add(new StoreItem(R.drawable.ic_challenge_icon, "Challenge Friends", "Challenge your friend and win point. Wake up early and be the winner", 500, false));
+        storeList.add(new StoreItem(R.drawable.ic_group_button, "Social Feature", "Challenge people and win points. Wake up early and be the winner", 500, challenge_friend));
     }
 
     @Override
