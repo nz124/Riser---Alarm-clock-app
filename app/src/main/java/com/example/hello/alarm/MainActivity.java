@@ -217,8 +217,9 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public static void incrementPointAndSaveToDb(final Context context, final FirebaseUser user, final boolean increment, final int point) {
+    public static boolean incrementPointAndSaveToDb(final Context context, final FirebaseUser user, final boolean increment, final int point) {
         myRef = database.child(user.getUid()).child("point");
+        final boolean[] successful = {true};
 
         //Get user's current point
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -230,18 +231,22 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else if (updatedPoint != 0){
                     updatedPoint -= point;
+                } else {
                 }
+
                 //Update point from Database
                 Map<String, Object> childUpdate = new HashMap<>();
                 childUpdate.put("/"+ user.getUid() + "/" + "point", updatedPoint);
                 database.updateChildren(childUpdate);
-                Toast.makeText(context, "You have "+ updatedPoint + " left!", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "You have "+ updatedPoint + " point left!", Toast.LENGTH_LONG).show();
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 //...
             }
         });
+        return successful[0];
     }
 
     public void createFirstTimeUserData(FirebaseUser user) {
