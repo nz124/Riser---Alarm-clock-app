@@ -49,5 +49,7 @@ dependencies {
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3' //Scifi chart
 
+    implementation 'com.google.api-client:google-api-client:1.23.0'
+
 }
 apply plugin: 'com.google.gms.google-services'

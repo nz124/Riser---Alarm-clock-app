@@ -277,7 +277,6 @@ public class SleepAnalysisFragment extends Fragment {
                     );
 
                     chart.setLayoutParams(params);
-
                     parentLayout.addView(chart); // add the programmatically created chart
 
                     chart.setDrawBarShadow(false);
@@ -371,11 +370,10 @@ public class SleepAnalysisFragment extends Fragment {
                 if (dataExist){
                     // programmatically create a LineChart and set size
                     LineChart chart = new LineChart(getContext());
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                    chart.setLayoutParams(new RelativeLayout.LayoutParams(
                             RelativeLayout.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT
-                    );
-
+                    ));
 
 
                     LineDataSet dataSet = new LineDataSet(monthData, "Sleeping Time");
@@ -394,7 +392,6 @@ public class SleepAnalysisFragment extends Fragment {
 
                     lineData = new LineData(dataSet);
 
-                    chart.setLayoutParams(params);
                     parentLayout.addView(chart); // add the programmatically created chart
 
 

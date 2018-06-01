@@ -130,14 +130,12 @@ public class MainActivity extends AppCompatActivity {
         //Sign user in anonymously
         if (currentUser == null) {
             loginAsGuest();
-            Log.e("hey", "onCreate: "+ FirebaseInstanceId.getInstance().getToken());
         }
         else {
             //Listen for changes from database and update UI
             updateUI(currentUser);
             //Convert guest account to Facebook/Google account if possible
             linkAccount();
-            Log.e("hey", "onCreate: "+ FirebaseInstanceId.getInstance().getToken());
         }
 
         //Determine to increment or decrement point based on the extras being passed in
@@ -241,15 +239,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createFirstTimeUserData(FirebaseUser user) {
-        String mName, mPhotoUriString, user_id;
+        String mName, mPhotoUriString, user_id, fcm_token;
         user_id = user.getUid();
         myRef = database.child(user_id);
 
-        mName = (user.getDisplayName() == null) ? "Guest" + new Random().nextInt() : user.getDisplayName();
+
+        //get token for firebase cloud messaging
+        fcm_token = FirebaseInstanceId.getInstance().getToken();
+        mName = (user.getDisplayName() == null ) ? "Guest" + new Random().nextInt() : user.getDisplayName();
         mPhotoUri = (user.getPhotoUrl() == null) ? defaultUri : user.getPhotoUrl();
         mPhotoUriString = mPhotoUri.toString();
 
-        User newUser = new User(mName, mPhotoUriString, 0);
+        User newUser = new User(mName, mPhotoUriString, 0, fcm_token);
         myRef.setValue(newUser);
 
     }
@@ -394,68 +395,5 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         database.child(currentUser.getUid()).removeEventListener(eventListener);
     }
-
-    private void pushNotification(final String point) {
-        database.child(currentUser.getUid()).child("FCM Token").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String AUTH_TOKEN = dataSnapshot.getValue(String.class);
-                JSONObject jPayload = new JSONObject();
-                JSONObject jNotification = new JSONObject();
-                JSONObject jData = new JSONObject();
-                try {
-                    jNotification.put("title", "You are challenged");
-                    jNotification.put("body", "Someone challenged you for " + point);
-                    jNotification.put("sound", "default");
-                    jNotification.put("badge", "1");
-                    jNotification.put("click_action", "OPEN_ACTIVITY_1");
-                    jNotification.put("icon", "ic_notification");
-
-                    jData.put("picture", "http://opsbug.com/static/google-io.jpg");
-
-                    JSONArray ja = new JSONArray();
-                    ja.put(AUTH_TOKEN);
-                    jPayload.put("registration_ids", ja);
-
-
-                    jPayload.put("priority", "high");
-                    jPayload.put("notification", jNotification);
-                    jPayload.put("data", jData);
-
-                    URL url = new URL("https://fcm.googleapis.com/fcm/send");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Authorization", "AUTH-KEY");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setDoOutput(true);
-
-                    // Send FCM message content.
-                    OutputStream outputStream = conn.getOutputStream();
-                    outputStream.write(jPayload.toString().getBytes());
-
-//            // Read FCM response.
-//            InputStream inputStream = conn.getInputStream();
-//            final String resp = convertStreamToString(inputStream);
-
-//            Handler h = new Handler(Looper.getMainLooper());
-//            h.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mTextView.setText(resp);
-//                }
-//            });
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-
 
 }

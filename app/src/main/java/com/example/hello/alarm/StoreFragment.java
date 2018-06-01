@@ -60,7 +60,7 @@ public class StoreFragment extends Fragment {
         mStaggeredGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mStaggeredGridLayoutManager);
 
-        // specify an adapter (see also next example)
+        // specify an adapter
         mAdapter = new StoreItemsAdapter(storeList);
         mRecyclerView.setAdapter(mAdapter);
 
