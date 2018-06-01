@@ -1,6 +1,10 @@
 package com.example.hello.alarm;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -17,8 +21,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -132,29 +139,71 @@ public class StoreFragment extends Fragment {
                 holder.itemPurchaseButton.setText("Activated");
                 holder.itemPurchaseButton.setEnabled(false);
             }
+
+
             //Get database reference to user's item list
             currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser != null){
-                myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid()).child("Items");
+                myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid());
                 holder.itemPurchaseButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String item = "";
-                        switch (holder.itemTitle.getText().toString()) {
-                            case ("Sleep Tracker"):
-                                item = "Sleep Tracker";
-                                break;
-                            case ("Social Feature"):
-                                item = "Social Feature";
-                                break;
-                        }
-                        //Update item on the database
-                        myRef.child(item).setValue(true);
-                        Toast.makeText(getContext(), "You have successfully unlocked "+ item, Toast.LENGTH_SHORT).show();
-                        MainActivity.incrementPointAndSaveToDb(getContext(), currentUser, false, storeList.get(position).price);
-                        //Restart application
-                        getActivity().finish();
-                        MainActivity.restartActivity(getContext());
+                        //CHeck if user has enough point
+                        myRef.child("point").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                //Build an alert
+                                AlertDialog.Builder builder;
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+                                } else {
+                                    builder = new AlertDialog.Builder(getContext());
+                                }
+
+                                int point = dataSnapshot.getValue(int.class);
+                                int itemPrice = storeList.get(position).price;
+                                if (point < itemPrice){
+                                    builder.setTitle("Not enough point")
+                                            .setMessage("You currently only have " + point + " point, sleep to earn more point and come back!")
+                                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // do nothing
+                                                }
+                                            })
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .show();
+                                }
+                                else {
+                                    builder.setTitle("Confirm")
+                                            .setMessage("This item costs " + itemPrice + " point, are you sure you want to buy this?")
+                                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    String itemName = holder.itemTitle.getText().toString();
+                                                    //Update item on the database
+                                                    myRef.child("Items").child(itemName).setValue(true);
+                                                    Toast.makeText(getContext(), "You have successfully unlocked "+ itemName, Toast.LENGTH_SHORT).show();
+                                                    MainActivity.incrementPointAndSaveToDb(getContext(), currentUser, false, storeList.get(position).price);
+                                                    //Restart application
+                                                    getActivity().finish();
+                                                    MainActivity.restartActivity(getContext());
+                                                }
+                                            })
+                                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // do nothing
+                                                }
+                                            })
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 });
             }
