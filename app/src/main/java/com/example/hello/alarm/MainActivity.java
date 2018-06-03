@@ -124,16 +124,17 @@ public class MainActivity extends AppCompatActivity {
 
         //Access database and reference to the data of the current's user
         database = FirebaseDatabase.getInstance().getReference();
+        Log.e("IS THERE A DATABASE", "onCreate: " + database);
         mAuth = FirebaseAuth.getInstance();
 
         // Check if user is signed in (non-null) and update UI accordingly.
         currentUser = mAuth.getCurrentUser();
         //Sign user in anonymously
         if (currentUser == null) {
-            Log.e("", "onCreate: " + "CURRENT USER = NULL" );
             loginAsGuest();
         }
         else {
+            Log.e("CHECK CURRENT USER", "onCreate: "+ currentUser );
             //Listen for changes from database and update UI
             updateUI(currentUser);
             //Convert guest account to Facebook/Google account if possible
@@ -250,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createFirstTimeUserData(FirebaseUser user) {
+        Log.e("", "createFirstTimeUserData: " + user.getUid() );
         String mName, mPhotoUriString, user_id;
         user_id = user.getUid();
         myRef = database.child(user_id);
@@ -358,13 +360,22 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Show fragments and functions properly depending on user's purchased items
-        database.child(user.getUid()).child("Items").addListenerForSingleValueEvent(new ValueEventListener() {
+        database.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child("Sleep Tracker").getValue() != null){
+                User user = dataSnapshot.getValue(User.class);
+                Log.e("USER OBJECT", "onDataChange: " + user );
+                Log.e("USER NAME", "onDataChange: " + user.getName() );
+                nav_name.setText(user.getName());
+                nav_point.setText("Point: " + user.getPoint());
+                Log.e("yo", "onDataChange: "+ user.getPoint() );
+                Glide.with(getApplicationContext())
+                        .load(user.photoUriString)
+                        .into(nav_photo);
+                if (user.getItem("Sleep Tracker") != null){
                     sleepAnalysisFragment = true;
                 };
-                if (dataSnapshot.child("Social Feature").getValue() != null) {
+                if (user.getItem("Social Feature") != null) {
                     friendFragment = true;
                 }
                 Log.e("TRUE OR FALSE", "onDataChange: " + dataSnapshot.child("Sleep Tracker"));
@@ -379,22 +390,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Update user information from Database
-        eventListener = database.child(user.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot data) {
-                User user = data.getValue(User.class);
-                nav_name.setText(user.name);
-                nav_point.setText("Point: " + user.point);
-                Log.e("yo", "onDataChange: "+ user.point );
-                Glide.with(getApplicationContext())
-                        .load(user.photoUriString)
-                        .into(nav_photo);
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //...
-            }
-        });
+        Log.e("User.getUid()", "updateUI: " + user.getUid() );
+        Log.e("User.getUid()", "updateUI: " + user.getUid() );
+//        eventListener = database.child(user.getUid()).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot data) {
+//
+//            }
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                //...
+//            }
+//        });
     }
 
     public static void clearNotification(Context context, int alarm_id){
