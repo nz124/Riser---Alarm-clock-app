@@ -60,6 +60,9 @@ public class FriendListFragment extends Fragment {
         View root = inflater.inflate(R.layout.friend_list_fragment_layout, container, false);
         parentView = root.findViewById(R.id.parentView);
 
+        //Show friend list as default
+        showFriendList();
+
         RadioButton showFriendButton = root.findViewById(R.id.show_friend_button);
         showFriendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,7 +133,7 @@ public class FriendListFragment extends Fragment {
                 super(parentView);
                 this.userPhoto = parentView.findViewById(R.id.friend_image);
                 this.userName = parentView.findViewById(R.id.friend_name);
-                this.userPoint= parentView.findViewById(R.id.friend_point);
+                this.userPoint = parentView.findViewById(R.id.friend_point);
                 this.challengeButton = parentView.findViewById(R.id.challenge_button);
             }
         }
@@ -143,11 +146,10 @@ public class FriendListFragment extends Fragment {
         // Create new views (invoked by the layout manager)
         @Override
         public FriendAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                                             int viewType) {
+                                                           int viewType) {
             // create a new view
             LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.friend_list_item, parent, false);
-
 
 
             return new ViewHolder(v);
@@ -163,13 +165,12 @@ public class FriendListFragment extends Fragment {
                     .into(holder.userPhoto);
 
             holder.userName.setText(friendList.get(position).name);
-            holder.userPoint.setText("Point: "+String.valueOf(friendList.get(position).point));
+            holder.userPoint.setText("Point: " + String.valueOf(friendList.get(position).point));
 
             holder.challengeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showPointPicker(getContext());
-                    Toast.makeText(getContext(), friendList.get(position).name, Toast.LENGTH_SHORT).show();
+                    startActivity(SendChallenge.createIntent(getContext(), FirebaseAuth.getInstance().getUid(), holder.userName.getText().toString()));
                 }
             });
 
@@ -185,61 +186,11 @@ public class FriendListFragment extends Fragment {
         public int getItemCount() {
             return friendList.size();
         }
-    }
-
-    public void showPointPicker(Context context) {
-        final Dialog d = new Dialog(context);
-        d.setTitle("How many point do you want to use for this challenge?");
-        d.setContentView(R.layout.point_picker_dialog);
-        Button challengeButton = d.findViewById(R.id.confirm_button);
-        Button cancelButton = d.findViewById(R.id.cancel_button);
-        final TextView pointDisplay = d.findViewById(R.id.pointTextView);
-        final NumberPicker np = d.findViewById(R.id.number_picker);
-        myRef.child(FirebaseAuth.getInstance().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User currentUser = dataSnapshot.getValue(User.class);
-                int userPoint = currentUser.point;
-                np.setMinValue(0);   // min value 0
-                np.setMaxValue(userPoint); // max value == user's point
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-
-        np.setWrapSelectorWheel(false);
-        np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                picker.setValue( (newVal < oldVal) ? oldVal-100 : oldVal+100);
-            }
-        });
-        challengeButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v) {
-                pointDisplay.setText(String.valueOf(np.getValue())); //set the value to textview
-                d.dismiss();
-            }
-        });
-        cancelButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v) {
-                d.dismiss(); // dismiss the dialog
-            }
-        });
-        d.show();
-    }
+    };
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
     }
 }
 

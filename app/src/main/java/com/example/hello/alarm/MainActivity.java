@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createFirstTimeUserData(FirebaseUser user) {
-        String mName, mPhotoUriString, user_id, fcm_token;
+        String mName, mPhotoUriString, user_id;
         user_id = user.getUid();
         myRef = database.child(user_id);
 

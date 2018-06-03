@@ -1,8 +1,27 @@
 package com.example.hello.alarm;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.AssetManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.NumberPicker;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -15,110 +34,167 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.util.ExtraConstants;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class SendChallenge{
+public class SendChallenge extends Activity{
+    DatabaseReference myRef;
 
-
-    private static String SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
-    private static String FCM_CHALLENGE_ENDPOINT
-            = "https://fcm.googleapis.com/fcm/send";
-
-    SendChallenge(Context context, String title, String msg, String receiver) {
-        String challengeMessage = getFcmMessageJSONDataAndNotification(title, msg, receiver);
-        sendMessageToFcm(context, challengeMessage);
+    public static Intent createIntent(Context context, String user_id, String receiver_id ) {
+        return new Intent(context, SendChallenge.class).putExtra("user_id", user_id)
+                .putExtra("receiver_id", receiver_id);
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.challenge_layout);
 
-    //Using HttpURLConnection it send http post request containing data to FCM server
-    private void sendMessageToFcm(Context context, String postData) {
-        try {
 
-            HttpURLConnection httpConn = getConnection(context);
-            httpConn.setDoOutput(true);
-            httpConn.setUseCaches(false);
-            httpConn.setRequestMethod("POST");
+        final String user_id = getIntent().getStringExtra("user_id");
+        final String receiver_id = getIntent().getStringExtra("receiver_id");
 
-            DataOutputStream wr = new DataOutputStream(httpConn.getOutputStream());
-            wr.writeBytes(postData);
-            wr.flush();
-            wr.close();
+        final Button pickPointButton = findViewById(R.id.pick_point_button);
+        pickPointButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myRef = FirebaseDatabase.getInstance().getReference();
+                myRef.child(user_id).child("point").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        int point = dataSnapshot.getValue(int.class);
+                    }
 
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(httpConn.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+                    }
+                });
+                final Dialog d = new Dialog(SendChallenge.this);
+                d.setContentView(R.layout.point_picker_dialog);
+                Button challengeButton = d.findViewById(R.id.confirm_button);
+                Button cancelButton = d.findViewById(R.id.cancel_button);
+                final NumberPicker np = d.findViewById(R.id.number_picker);
+                //Set maximum range based on user's current point
+                myRef.child(user_id).child("point").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        int userPoint = dataSnapshot.getValue(int.class);
+                        np.setMinValue(0);   // min value 0
+                        np.setMaxValue(userPoint); // max value == user's point
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+                challengeButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v) {
+                        pickPointButton.setText(np.getValue() + " point");
+                        d.dismiss();
+                    }
+                });
+                cancelButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v) {
+                        d.dismiss(); // dismiss the dialog
+                    }
+                });
+                d.show();
+
             }
-            in.close();
+        });
 
-            Log.e("MESSAGE TOKEN", "sendMessageToFcm: " + response.toString() );
+        // TODO Auto-generated method stub
+        Calendar mcurrentTime = Calendar.getInstance();
+        final int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+        final int minute = mcurrentTime.get(Calendar.MINUTE);
+        final int day = mcurrentTime.get(Calendar.DAY_OF_MONTH);
+        final int month = mcurrentTime.get(Calendar.MONTH);
+        final int year = mcurrentTime.get(Calendar.YEAR);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        final Button pickTimeButton = findViewById(R.id.pick_time_button);
+        pickTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog mTimePicker;
+                mTimePicker = new TimePickerDialog(SendChallenge.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        pickTimeButton.setText(selectedHour + ":" + selectedMinute);
+                    }
+                }, hour, minute, true);//Yes 24 hour time
+                mTimePicker.setTitle("Select Time");
+                mTimePicker.show();
+            }
+        });
+
+        final Button pickDateButton = findViewById(R.id.pick_date_button);
+        pickDateButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog mDatePicker;
+                mDatePicker = new DatePickerDialog(SendChallenge.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        pickDateButton.setText(month + "/" + dayOfMonth);
+                    }
+                }, year, month, day);
+                mDatePicker.setTitle("Select date");
+                mDatePicker.show();
+            }
+        });
+
+        final Button challengeButton = findViewById(R.id.challenge_button);
+        challengeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Build an alert
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(SendChallenge.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(SendChallenge.this);
+                }
+                builder.setTitle("Confirm")
+                        .setMessage("You want to challenge " + receiver_id + " for " + pickPointButton.getText() + " to set an alarm at " + pickTimeButton.getText() + " on " + pickDateButton.getText()+ " and not snooze the alarm?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Toast.makeText(SendChallenge.this, "You have challenged " + receiver_id, Toast.LENGTH_SHORT).show();
+                                startActivity(MainActivity.createIntent(getApplicationContext(), null));
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(R.drawable.ic_challenge_icon)
+                        .show();
+            }
+        });
+
     }
-
-    private static String getAccessToken(Context context) throws IOException {
-        AssetManager assetManager = context.getAssets();
-        GoogleCredential googleCredential = GoogleCredential
-                .fromStream(assetManager.open("riser-alarm-firebase-adminsdk-wnkfx-1b4fc1722e.json"))
-                .createScoped(Arrays.asList(SCOPE));
-        googleCredential.refreshToken();
-        return googleCredential.getAccessToken();
-    }
-
-    //create HttpURLConnection setting Authorization token
-    //and Content-Type header
-    private HttpURLConnection getConnection(Context context) throws Exception {
-        URL url = new URL(FCM_CHALLENGE_ENDPOINT);
-        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-        httpURLConnection.setRequestProperty("Authorization", "Bearer " + getAccessToken(context));
-        httpURLConnection.setRequestProperty("Content-Type", "application/json; UTF-8");
-        return httpURLConnection;
-    }
-
-    private String getFcmMessageJSONDataAndNotification(String title, String msg, String receiver) {
-
-        JSONObject jPayload = new JSONObject();
-        JSONObject jNotification = new JSONObject();
-        JSONObject jData = new JSONObject();
-        try {
-            jNotification.put("title", title);
-            jNotification.put("body", msg);
-            jNotification.put("sound", "default");
-            jNotification.put("badge", "1");
-            jNotification.put("click_action", "OPEN_ACTIVITY_1");
-            jNotification.put("icon", "ic_notification");
-
-            jData.put("picture", "http://opsbug.com/static/google-io.jpg");
-
-
-            jPayload.put("to", receiver);
-
-
-            jPayload.put("priority", "high");
-            jPayload.put("notification", jNotification);
-            jPayload.put("data", jData);
-
-            Log.e("WHY NO ONE LIKED ME", "getFcmMessageJSONDataAndNotification: " +jPayload.toString() );
-            return jPayload.toString();
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-            return null;
-    }
-
-    }
+}

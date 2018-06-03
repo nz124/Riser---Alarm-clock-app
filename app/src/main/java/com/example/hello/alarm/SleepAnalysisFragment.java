@@ -139,7 +139,7 @@ public class SleepAnalysisFragment extends Fragment {
 
     public void showWeekChart(final View rootView) {
         TextView info = rootView.findViewById(R.id.information);
-        info.setText("Sleep Analysis (Week of " + firstDayOfWeek + "/" + currentMonth + "/" + currentYear + " )");
+        info.setText("Sleep Analysis: Current Week - Starting from Monday (28/5/2018)");
         myRef.child(currentYear).child(currentMonth).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -263,10 +263,18 @@ public class SleepAnalysisFragment extends Fragment {
                         hour =averageTimeInMillis / (1000 * 60 * 60) % 24;
                         hourAndMinuteValue = Math.round(hour + minute / 60 * 100);
 
-                        yearData.add(new BarEntry(Integer.valueOf(month.getKey()), hourAndMinuteValue));
-                        dataExists = true;
+//                        yearData.add(new BarEntry(Integer.valueOf(month.getKey()), hourAndMinuteValue));
+//                        dataExists = true;
                     }
                 }
+                //TO-DO: DELETE THESE HARD-CODED DATA
+                yearData.add(new BarEntry(1, 9));
+                yearData.add(new BarEntry(2, 5));
+                yearData.add(new BarEntry(3, 6));
+                yearData.add(new BarEntry(4, 7));
+                yearData.add(new BarEntry(5, 8));
+                yearData.add(new BarEntry(6, 7));
+                dataExists = true;
 
                 if (dataExists) {
                     // programmatically create a LineChart and set size
