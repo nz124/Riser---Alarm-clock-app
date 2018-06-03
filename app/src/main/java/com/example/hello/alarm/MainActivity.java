@@ -307,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 Log.d("success", "linkWithCredential:success");
                                 FirebaseUser user = task.getResult().getUser();
+                                createFirstTimeUserData(user);
                                 updateUI(user);
                                 Toast.makeText(context, "Link account successfully!",
                                         Toast.LENGTH_SHORT).show();
