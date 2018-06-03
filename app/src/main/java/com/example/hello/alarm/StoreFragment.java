@@ -28,12 +28,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StoreFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mStaggeredGridLayoutManager;
     private ArrayList<StoreItem> storeList;
+
+    private DatabaseReference databaseRef;
 
     boolean sleepAnalysisIsOwned = false;
     boolean challenge_friend = false;
@@ -143,13 +147,14 @@ public class StoreFragment extends Fragment {
 
             //Get database reference to user's item list
             currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            databaseRef = FirebaseDatabase.getInstance().getReference();
             if (currentUser != null){
-                myRef = FirebaseDatabase.getInstance().getReference().child(currentUser.getUid());
+                myRef = databaseRef.child(currentUser.getUid());
                 holder.itemPurchaseButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         //CHeck if user has enough point
-                        myRef.child("point").addListenerForSingleValueEvent(new ValueEventListener() {
+                        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 //Build an alert
@@ -160,11 +165,12 @@ public class StoreFragment extends Fragment {
                                     builder = new AlertDialog.Builder(getContext());
                                 }
 
-                                int point = dataSnapshot.getValue(int.class);
+                                final User user = dataSnapshot.getValue(User.class);
+                                int userPoint = user.getPoint();
                                 int itemPrice = storeList.get(position).price;
-                                if (point < itemPrice){
+                                if (userPoint < itemPrice){
                                     builder.setTitle("Not enough point")
-                                            .setMessage("You currently only have " + point + " point, sleep to earn more point and come back!")
+                                            .setMessage("You currently only have " + userPoint + " point, sleep to earn more point and come back!")
                                             .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     // do nothing
@@ -179,9 +185,11 @@ public class StoreFragment extends Fragment {
                                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-                                                    String itemName = holder.itemTitle.getText().toString();
                                                     //Update item on the database
-                                                    myRef.child("Items").child(itemName).setValue(true);
+                                                    String itemName = holder.itemTitle.getText().toString();
+                                                    user.addItem(itemName, 1);
+                                                    myRef.setValue(user);
+
                                                     Toast.makeText(getContext(), "You have successfully unlocked "+ itemName, Toast.LENGTH_SHORT).show();
                                                     MainActivity.incrementPointAndSaveToDb(getContext(), currentUser, false, storeList.get(position).price);
                                                     //Restart application

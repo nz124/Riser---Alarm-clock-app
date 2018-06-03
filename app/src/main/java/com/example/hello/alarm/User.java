@@ -35,9 +35,6 @@ public class User {
         return this.user_id;
     }
 
-    public void addItem(String item, Integer value){
-        this.items.put(item, value);
-    }
 
     public Integer getItem(String itemName){
         if (this.items != null){
@@ -45,6 +42,13 @@ public class User {
         } else {
             return null;
         }
+    }
+
+    public void addItem(String itemName, Integer count){
+        if (this.items == null) {
+            this.items = new HashMap<>();
+        }
+        this.items.put(itemName, count);
 
     }
 
