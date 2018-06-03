@@ -1,13 +1,10 @@
 package com.example.hello.alarm;
 
-import android.app.Fragment;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -39,19 +36,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -218,9 +203,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public static boolean incrementPointAndSaveToDb(final Context context, final FirebaseUser user, final boolean increment, final int point) {
+    public static void incrementPointAndSaveToDb(final Context context, final FirebaseUser user, final boolean increment, final int point) {
         myRef = database.child(user.getUid()).child("point");
-        final boolean[] successful = {true};
 
         //Get user's current point
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -247,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
                 //...
             }
         });
-        return successful[0];
     }
 
     public void createFirstTimeUserData(FirebaseUser user) {
@@ -361,12 +344,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Show fragments and functions properly depending on user's purchased items
-        database.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        eventListener = database.child(user.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                //Update UI on the navigation side drawer
                 User user = dataSnapshot.getValue(User.class);
-                Log.e("USER OBJECT", "onDataChange: " + user );
-                Log.e("USER NAME", "onDataChange: " + user.getName() );
                 nav_name.setText(user.getName());
                 nav_point.setText("Point: " + user.getPoint());
                 Log.e("yo", "onDataChange: "+ user.getPoint() );
@@ -379,7 +361,6 @@ public class MainActivity extends AppCompatActivity {
                 if (user.getItem("Social Feature") != null) {
                     friendFragment = true;
                 }
-                Log.e("TRUE OR FALSE", "onDataChange: " + dataSnapshot.child("Sleep Tracker"));
                 setupViewPager(viewPager, sleepAnalysisFragment, friendFragment);
                 indicator.setViewPager(viewPager);
             }
@@ -390,9 +371,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Update user information from Database
-        Log.e("User.getUid()", "updateUI: " + user.getUid() );
-        Log.e("User.getUid()", "updateUI: " + user.getUid() );
+
 //        eventListener = database.child(user.getUid()).addValueEventListener(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(DataSnapshot data) {
