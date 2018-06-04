@@ -16,6 +16,12 @@ Save your progress on different devices by logging in with your Google, Facebook
 | ------------- | ------------- |---------------------------------------|
 |![](https://image.ibb.co/ihf57d/Screen_Shot_2018_06_03_at_7_20_09_PM.png)|![](https://image.ibb.co/hJku0y/Screen_Shot_2018_06_03_at_7_20_45_PM.png)|![](https://image.ibb.co/hHuySd/Screen_Shot_2018_06_03_at_7_21_06_PM.png)|
 
+## Earn point
+| Screen when alarm goes off  | Turn off the alarm to earn point <br>(point is weighted based on alarm's duration) |
+| ------------- | ------------- |
+| ![](https://image.ibb.co/dTNUYJ/Screen_Shot_2018_06_03_at_7_56_17_PM.png)|![](https://image.ibb.co/mAZySd/Screen_Shot_2018_06_03_at_7_56_43_PM.png)|
+
+
 ## Unlock New Features
 
 Unlock new features in the store
